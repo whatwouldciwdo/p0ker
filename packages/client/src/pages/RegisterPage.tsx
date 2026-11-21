@@ -16,7 +16,13 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/api/auth/register', { username, password });
+      const cleanUsername = username.trim();
+      const autoEmail = `${cleanUsername.toLowerCase().replace(/[^a-z0-9]/g, '')}@p0ker.local`;
+      const res = await api.post('/api/auth/register', {
+        username: cleanUsername,
+        password,
+        email: autoEmail,
+      });
       const { id, username: uname, chips } = res.data;
       setUser({ id, username: uname, chips });
       navigate('/lobby');

@@ -16,7 +16,12 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/api/auth/login', { username, password });
+      const cleanUser = username.trim();
+      const res = await api.post('/api/auth/login', {
+        username: cleanUser,
+        email: cleanUser,
+        password,
+      });
       const { id, username: uname, chips } = res.data;
       setUser({ id, username: uname, chips });
       navigate('/lobby');
