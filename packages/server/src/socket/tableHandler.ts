@@ -58,6 +58,9 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
           socket.data.tableId = tableId;
           socket.emit('toast', `Kembali ke meja "${table.name}"`, 'success');
           await broadcastToTable(io, tableId);
+          if (table.getPhase() === 'waiting' && table.activePlayerCount() >= 2 && table.hasHumanPlayer()) {
+            setTimeout(() => table.startRound(), 1000);
+          }
           return;
         }
 

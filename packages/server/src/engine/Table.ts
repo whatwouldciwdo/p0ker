@@ -93,6 +93,20 @@ export class Table {
     return this.players.has(id);
   }
 
+  hasHumanPlayer(): boolean {
+    return Array.from(this.players.values()).some(
+      (p) => !p.isBot && p.status !== 'disconnected' && p.status !== 'sitting-out'
+    );
+  }
+
+  getPhase(): GamePhase {
+    return this.phase;
+  }
+
+  activePlayerCount(): number {
+    return this.activePlayers().length;
+  }
+
   addPlayer(id: string, username: string, buyIn: number): { success: boolean; error?: string } {
     if (this.players.has(id)) {
       return { success: false, error: 'Already at the table' };
@@ -126,8 +140,8 @@ export class Table {
 
     this.emit();
 
-    // Auto-start if >= 2 active players and game is waiting
-    if (this.phase === 'waiting' && this.activePlayers().length >= 2) {
+    // Auto-start if >= 2 active players, human present, and game is waiting
+    if (this.phase === 'waiting' && this.activePlayers().length >= 2 && this.hasHumanPlayer()) {
       setTimeout(() => this.startRound(), 1000);
     }
 
@@ -201,7 +215,7 @@ export class Table {
 
     this.emit();
 
-    if (this.phase === 'waiting' && this.activePlayers().length >= 2) {
+    if (this.phase === 'waiting' && this.activePlayers().length >= 2 && this.hasHumanPlayer()) {
       setTimeout(() => this.startRound(), 1000);
     }
 
@@ -316,6 +330,7 @@ export class Table {
   startRound(): void {
     const active = this.activePlayers();
     if (active.length < 2) return;
+    if (!this.hasHumanPlayer()) return;
     if (this.phase !== 'waiting') return;
 
     this.handNumber++;
@@ -349,8 +364,22 @@ export class Table {
       (uid) => this.players.get(uid)!.status === 'active'
     );
     const dealerIdx = activeSeatOrder.indexOf(this.dealerUserId!);
-    const sbIdx = (dealerIdx + 1) % activeSeatOrder.length;
-    const bbIdx = (dealerIdx + 2) % activeSeatOrder.length;
+
+    let sbIdx: number;
+    let bbIdx: number;
+    let firstActionIdx: number;
+
+    if (activeSeatOrder.length === 2) {
+      // Heads-up: Dealer is Small Blind and acts first pre-flop
+      sbIdx = dealerIdx;
+      bbIdx = (dealerIdx + 1) % 2;
+      firstActionIdx = sbIdx;
+    } else {
+      // 3+ players: SB is after dealer, BB is after SB, action starts after BB (UTG)
+      sbIdx = (dealerIdx + 1) % activeSeatOrder.length;
+      bbIdx = (dealerIdx + 2) % activeSeatOrder.length;
+      firstActionIdx = (bbIdx + 1) % activeSeatOrder.length;
+    }
 
     const sbPlayer = this.players.get(activeSeatOrder[sbIdx])!;
     const bbPlayer = this.players.get(activeSeatOrder[bbIdx])!;
@@ -370,9 +399,8 @@ export class Table {
       p.holeCards = this.deck.deal(2);
     }
 
-    // Pre-flop: action starts after BB
-    const utg = activeSeatOrder[(bbIdx + 1) % activeSeatOrder.length];
-    this.currentPlayerUserId = utg;
+    // Set first player to act pre-flop
+    this.currentPlayerUserId = activeSeatOrder[firstActionIdx];
     this.phase = 'pre-flop';
 
     this.emit();
@@ -464,12 +492,16 @@ export class Table {
   private applyRaise(player: InternalPlayer, totalBetAmount: number): void {
     // totalBetAmount is the total they want to put in this round (player.bet already counted)
     const raiseAmount = totalBetAmount - player.bet; // new chips committed
-    if (raiseAmount <= 0) return;
+    if (raiseAmount <= 0) {
+      this.applyCall(player);
+      return;
+    }
 
     const raiseSize = totalBetAmount - this.currentBet;
     const minRaise = Math.max(this.opts.bigBlind, this.lastRaiseSize);
     if (raiseSize < minRaise && player.chips > raiseAmount) {
-      // sub-minimum raise only allowed if going all-in
+      // sub-minimum raise only allowed if going all-in, otherwise call
+      this.applyCall(player);
       return;
     }
 
@@ -536,6 +568,7 @@ export class Table {
       this.advancePhase();
     } else {
       this.moveToNextPlayer();
+      this.emit();
       this.startTurnTimer();
     }
   }
@@ -769,15 +802,15 @@ export class Table {
   }
 
   private resetToWaiting(): void {
-    // Remove broke players
+    // Remove broke players & replenish bots
     for (const [uid, p] of this.players.entries()) {
-      if (p.chips <= 0 && p.status !== 'disconnected') {
-        if (p.isBot) {
+      if (p.isBot) {
+        if (p.chips < this.opts.bigBlind) {
           p.chips = this.opts.minBuyIn * 2;
-        } else {
-          this.players.delete(uid);
-          this.seatOrder = this.seatOrder.filter((id) => id !== uid);
         }
+      } else if (p.chips <= 0 && p.status !== 'disconnected') {
+        this.players.delete(uid);
+        this.seatOrder = this.seatOrder.filter((id) => id !== uid);
       }
     }
 
@@ -805,7 +838,7 @@ export class Table {
 
     this.emit();
 
-    if (this.activePlayers().length >= 2) {
+    if (this.activePlayers().length >= 2 && this.hasHumanPlayer()) {
       setTimeout(() => this.startRound(), 3000);
     }
   }
@@ -900,7 +933,7 @@ export class Table {
     // Human-like thinking time: 1.2s - 2.4s
     const thinkTime = 1200 + Math.floor(Math.random() * 1200);
 
-    setTimeout(() => {
+    this.turnTimer = setTimeout(() => {
       if (
         this.currentPlayerUserId === botId &&
         this.phase !== 'waiting' &&
