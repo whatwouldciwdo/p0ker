@@ -10,20 +10,33 @@ export class TableManager {
   private io?: Server;
 
   private constructor() {
-    // Default starter tables
-    this.createTable({
+    // Default starter tables with fixed IDs
+    this.createTableWithId('casual-1', {
       name: 'Casual Table ($10 / $20)',
       smallBlind: 10,
       bigBlind: 20,
       maxPlayers: 6,
       minBuyIn: 200,
+      allowBots: true,
+      initialBots: 1,
     });
-    this.createTable({
+    this.createTableWithId('high-roller-1', {
       name: 'High Roller ($50 / $100)',
       smallBlind: 50,
       bigBlind: 100,
       maxPlayers: 9,
       minBuyIn: 1000,
+      allowBots: true,
+      initialBots: 2,
+    });
+    this.createTableWithId('ai-arena-1', {
+      name: '🤖 AI Arena ($10 / $20)',
+      smallBlind: 10,
+      bigBlind: 20,
+      maxPlayers: 6,
+      minBuyIn: 200,
+      allowBots: true,
+      initialBots: 2,
     });
   }
 
@@ -42,11 +55,11 @@ export class TableManager {
     return this.io;
   }
 
-  public createTable(
+  public createTableWithId(
+    tableId: string,
     opts: CreateTableOptions,
     onStateChange?: (state: TableState) => void
   ): Table {
-    const tableId = uuidv4().slice(0, 8);
     const table = new Table(tableId, opts, (state) => {
       if (onStateChange) onStateChange(state);
       if (this.io) {
@@ -57,8 +70,30 @@ export class TableManager {
     return table;
   }
 
-  public getTable(tableId: string): Table | undefined {
-    return this.tables.get(tableId);
+  public createTable(
+    opts: CreateTableOptions,
+    onStateChange?: (state: TableState) => void
+  ): Table {
+    const tableId = uuidv4().slice(0, 8);
+    return this.createTableWithId(tableId, opts, onStateChange);
+  }
+
+  public getTable(tableId: string): Table {
+    let table = this.tables.get(tableId);
+    if (!table) {
+      // Gracefully auto-recreate table if lost on server restart
+      console.log(`[TableManager] Auto-recreating missing table ${tableId}`);
+      table = this.createTableWithId(tableId, {
+        name: `Table ${tableId}`,
+        smallBlind: 10,
+        bigBlind: 20,
+        maxPlayers: 6,
+        minBuyIn: 200,
+        allowBots: true,
+        initialBots: 0,
+      });
+    }
+    return table;
   }
 
   public deleteTable(tableId: string): void {

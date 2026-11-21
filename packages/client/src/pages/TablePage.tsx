@@ -97,8 +97,13 @@ export default function TablePage() {
     } catch (err: any) {
       console.error('handleAddBot error:', err);
       const msg = err.response?.data?.error || err.message || 'Gagal menambahkan bot';
-      setErrorMessage(msg);
-      setTimeout(() => setErrorMessage(null), 4000);
+      if (String(msg).includes('404') || String(msg).toLowerCase().includes('tidak ditemukan')) {
+        setErrorMessage('Meja telah kadaluarsa / server direstart. Mengalihkan ke lobi...');
+        setTimeout(() => navigate('/lobby'), 1500);
+      } else {
+        setErrorMessage(msg);
+        setTimeout(() => setErrorMessage(null), 4000);
+      }
     }
   };
 
