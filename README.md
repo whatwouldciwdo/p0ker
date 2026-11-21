@@ -60,7 +60,7 @@ Isi konfigurasi database PostgreSQL:
 PORT=3001
 DATABASE_URL=postgresql://postgres:password@localhost:5432/poker_db
 COOKIE_SECRET=p0ker_super_secret_key
-CLIENT_URL=http://localhost:5173
+CLIENT_URL=http://localhost:3221
 NODE_ENV=development
 ```
 
@@ -75,9 +75,9 @@ npm run dev
 
 Atau jalankan terpisah:
 - **Backend:** `npm run dev:server` (berjalan di port `3001`)
-- **Frontend:** `npm run dev:client` (berjalan di port `5173`)
+- **Frontend:** `npm run dev:client` (berjalan di port `3221`)
 
-Buka browser di **`http://localhost:5173`**.
+Buka browser di **`http://localhost:3221`**.
 
 ---
 
@@ -86,7 +86,7 @@ Buka browser di **`http://localhost:5173`**.
 Karena Vite sudah dikonfigurasi mem-proxy REST API (`/api`) dan WebSocket (`/socket.io`) ke server, Anda cukup membuka **1 tunnel** ke port frontend:
 
 ```bash
-cloudflared tunnel --url http://localhost:5173
+cloudflared tunnel --url http://localhost:3221
 ```
 
 Buka dan bagikan URL HTTPS yang dihasilkan (contoh: `https://xxxx.trycloudflare.com`) ke teman Anda untuk bermain bersama secara online!
