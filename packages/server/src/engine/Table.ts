@@ -89,6 +89,10 @@ export class Table {
 
   // ─── Public API ─────────────────────────────────────────────────────────────
 
+  hasPlayer(id: string): boolean {
+    return this.players.has(id);
+  }
+
   addPlayer(id: string, username: string, buyIn: number): { success: boolean; error?: string } {
     if (this.players.has(id)) {
       return { success: false, error: 'Already at the table' };

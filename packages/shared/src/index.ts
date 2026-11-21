@@ -136,9 +136,9 @@ export interface ClientToServerEvents {
 
   // Table
   'table:join': (data: any, buyIn?: number) => void;
-  'table:leave': () => void;
-  'table:addBot': () => void;
-  'table:removeBot': (data?: { botId?: string }) => void;
+  'table:leave': (data?: { tableId?: string }) => void;
+  'table:addBot': (data?: { tableId?: string }) => void;
+  'table:removeBot': (data?: { tableId?: string; botId?: string }) => void;
   'table:sitOut': () => void;
   'table:sitIn': () => void;
   'table:action': (data: any, amount?: number) => void;
@@ -148,5 +148,5 @@ export interface ClientToServerEvents {
 
   // Chat
   'chat:message': (data: { message: string }) => void;
-  'table:chat': (message: string) => void;
+  'table:chat': (data: any) => void;
 }

@@ -52,6 +52,15 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
           return;
         }
 
+        // If player is already at the table (reconnect / page refresh)
+        if (table.hasPlayer(userId)) {
+          socket.join(tableId);
+          socket.data.tableId = tableId;
+          socket.emit('toast', `Kembali ke meja "${table.name}"`, 'success');
+          await broadcastToTable(io, tableId);
+          return;
+        }
+
         if (buyIn < table.minBuyIn) {
           socket.emit(
             'error',
@@ -99,9 +108,11 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
   );
 
   // ── table:leave ─────────────────────────────────────────────────────────────
-  socket.on('table:leave', async () => {
+  socket.on('table:leave', async (data?: { tableId?: string }) => {
     try {
-      const tableId: string | undefined = socket.data.tableId;
+      const tableId: string | undefined =
+        (typeof data === 'object' && data?.tableId) ||
+        socket.data.tableId;
       if (!tableId) return;
 
       const tableManager = TableManager.getInstance();
@@ -135,11 +146,25 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
       const action: PlayerAction = typeof arg1 === 'object' ? arg1.action : arg1;
       const amount: number | undefined = typeof arg1 === 'object' ? arg1.amount : arg2;
 
-      const tableId: string | undefined = socket.data.tableId;
+      let tableId: string | undefined =
+        (typeof arg1 === 'object' && arg1?.tableId) ||
+        socket.data.tableId;
+
+      if (!tableId) {
+        for (const room of socket.rooms) {
+          if (room !== socket.id) {
+            tableId = room;
+            break;
+          }
+        }
+      }
+
       if (!tableId) {
         socket.emit('error', 'You are not at a table.');
         return;
       }
+
+      socket.data.tableId = tableId;
 
       const tableManager = TableManager.getInstance();
       const table = tableManager.getTable(tableId);
@@ -162,14 +187,35 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
   socket.on('game:action', handlePlayerAction);
 
   // ── table:addBot ────────────────────────────────────────────────────────────
-  socket.on('table:addBot', async () => {
+  socket.on('table:addBot', async (data?: { tableId?: string }) => {
     try {
-      const tableId: string | undefined = socket.data.tableId;
-      if (!tableId) return;
+      let tableId: string | undefined =
+        (typeof data === 'object' && data?.tableId) ||
+        socket.data.tableId;
+
+      if (!tableId) {
+        for (const room of socket.rooms) {
+          if (room !== socket.id) {
+            tableId = room;
+            break;
+          }
+        }
+      }
+
+      if (!tableId) {
+        socket.emit('error', 'Table ID tidak ditemukan. Silakan refresh halaman meja.');
+        return;
+      }
+
+      socket.data.tableId = tableId;
+      socket.join(tableId);
 
       const tableManager = TableManager.getInstance();
       const table = tableManager.getTable(tableId);
-      if (!table) return;
+      if (!table) {
+        socket.emit('error', 'Table tidak ditemukan.');
+        return;
+      }
 
       const res = table.addBot();
       if (!res.success) {
@@ -177,23 +223,40 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
         return;
       }
 
+      io.to(tableId).emit('toast', '🤖 Bot AI berhasil ditambahkan!', 'success');
       await broadcastToTable(io, tableId);
-    } catch (err) {
+    } catch (err: any) {
       console.error('table:addBot error:', err);
+      socket.emit('error', err?.message || 'Gagal menambahkan bot');
     }
   });
 
   // ── table:removeBot ─────────────────────────────────────────────────────────
-  socket.on('table:removeBot', async (data?: { botId?: string }) => {
+  socket.on('table:removeBot', async (data?: { tableId?: string; botId?: string }) => {
     try {
-      const tableId: string | undefined = socket.data.tableId;
+      let tableId: string | undefined =
+        (typeof data === 'object' && data?.tableId) ||
+        socket.data.tableId;
+
+      if (!tableId) {
+        for (const room of socket.rooms) {
+          if (room !== socket.id) {
+            tableId = room;
+            break;
+          }
+        }
+      }
+
       if (!tableId) return;
 
       const tableManager = TableManager.getInstance();
       const table = tableManager.getTable(tableId);
       if (!table) return;
 
-      table.removeBot(data?.botId);
+      const res = table.removeBot(data?.botId);
+      if (res.success) {
+        io.to(tableId).emit('toast', 'Bot AI telah dikeluarkan.', 'info');
+      }
       await broadcastToTable(io, tableId);
     } catch (err) {
       console.error('table:removeBot error:', err);
@@ -201,8 +264,20 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
   });
 
   // ── table:chat ──────────────────────────────────────────────────────────────
-  socket.on('table:chat', (message: string) => {
-    const tableId: string | undefined = socket.data.tableId;
+  socket.on('table:chat', (data: any) => {
+    let message = typeof data === 'object' ? data.message : data;
+    let tableId: string | undefined =
+      (typeof data === 'object' && data.tableId) ||
+      socket.data.tableId;
+
+    if (!tableId) {
+      for (const room of socket.rooms) {
+        if (room !== socket.id) {
+          tableId = room;
+          break;
+        }
+      }
+    }
     if (!tableId) return;
 
     // Sanitize – strip HTML, limit length
@@ -222,6 +297,15 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
     try {
       const tableId: string | undefined = socket.data.tableId;
       if (!tableId) return;
+
+      // Check if user still has other active sockets connected to this table room
+      const userSockets = await io.in(tableId).fetchSockets();
+      const stillConnected = userSockets.some(
+        (s) => s.data.userId === userId && s.id !== socket.id
+      );
+      if (stillConnected) {
+        return;
+      }
 
       const tableManager = TableManager.getInstance();
       const table = tableManager.getTable(tableId);

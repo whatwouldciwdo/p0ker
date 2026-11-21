@@ -23,6 +23,7 @@ export default function TablePage() {
 
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
 
   useEffect(() => {
     if (!tableId || !user) {
@@ -47,10 +48,16 @@ export default function TablePage() {
       setTimeout(() => setErrorMessage(null), 4000);
     };
 
+    const handleToast = (msg: string) => {
+      setNotification(msg);
+      setTimeout(() => setNotification(null), 3000);
+    };
+
     socket.on('table:state', handleGameState);
     socket.on('game:state', handleGameState);
     socket.on('chat:message', handleChat);
     socket.on('error', handleError);
+    socket.on('toast', handleToast);
 
     // Join table
     socket.emit('table:join', { tableId, buyIn });
@@ -60,34 +67,35 @@ export default function TablePage() {
       socket.off('game:state', handleGameState);
       socket.off('chat:message', handleChat);
       socket.off('error', handleError);
+      socket.off('toast', handleToast);
     };
   }, [tableId, user]);
 
   const handleAction = (action: PlayerAction, amount?: number) => {
     const socket = getSocket();
-    socket.emit('game:action', { action, amount });
+    socket.emit('game:action', { tableId, action, amount });
   };
 
   const handleLeave = () => {
     const socket = getSocket();
-    socket.emit('table:leave');
+    socket.emit('table:leave', { tableId });
     clearGame();
     navigate('/lobby');
   };
 
   const handleAddBot = () => {
     const socket = getSocket();
-    socket.emit('table:addBot');
+    socket.emit('table:addBot', { tableId });
   };
 
   const handleRemoveBot = () => {
     const socket = getSocket();
-    socket.emit('table:removeBot');
+    socket.emit('table:removeBot', { tableId });
   };
 
   const handleSendChat = (message: string) => {
     const socket = getSocket();
-    socket.emit('chat:message', { message });
+    socket.emit('table:chat', { tableId, message });
   };
 
   if (!tableState) {
@@ -107,6 +115,12 @@ export default function TablePage() {
       {errorMessage && (
         <div className="toast-notification toast-error">
           <span>⚠️ {errorMessage}</span>
+        </div>
+      )}
+
+      {notification && (
+        <div className="toast-notification toast-success">
+          <span>{notification}</span>
         </div>
       )}
 
