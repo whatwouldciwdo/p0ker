@@ -26,11 +26,26 @@ async function createSession(userId: string): Promise<string> {
 // POST /api/auth/register
 router.post('/register', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, email, password } = req.body;
+    const { username, password } = req.body;
+    let email = req.body.email;
 
-    if (!username || !email || !password) {
-      res.status(400).json({ error: 'username, email, and password are required' });
+    if (!username || !password) {
+      res.status(400).json({ error: 'Username dan password wajib diisi' });
       return;
+    }
+
+    if (username.length < 3 || username.length > 20) {
+      res.status(400).json({ error: 'Username harus antara 3 - 20 karakter' });
+      return;
+    }
+
+    if (password.length < 6) {
+      res.status(400).json({ error: 'Password minimal 6 karakter' });
+      return;
+    }
+
+    if (!email) {
+      email = `${username.toLowerCase().replace(/[^a-z0-9]/g, '')}@p0ker.local`;
     }
 
     const passwordHash = await bcrypt.hash(password, 12);
@@ -49,11 +64,10 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
     res.status(201).json({ id: user.id, username: user.username, chips: user.chips });
   } catch (err: any) {
     if (err.code === '23505') {
-      // Unique constraint violation
-      res.status(409).json({ error: 'Username or email already taken' });
+      res.status(409).json({ error: 'Username sudah digunakan, silakan pilih yang lain' });
     } else {
       console.error('Register error:', err);
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({ error: 'Terjadi kesalahan pada server' });
     }
   }
 });
@@ -61,27 +75,28 @@ router.post('/register', async (req: Request, res: Response): Promise<void> => {
 // POST /api/auth/login
 router.post('/login', async (req: Request, res: Response): Promise<void> => {
   try {
-    const { email, password } = req.body;
+    const identifier = req.body.username || req.body.email;
+    const { password } = req.body;
 
-    if (!email || !password) {
-      res.status(400).json({ error: 'email and password are required' });
+    if (!identifier || !password) {
+      res.status(400).json({ error: 'Username dan password wajib diisi' });
       return;
     }
 
     const result = await pool.query(
-      'SELECT id, username, chips, password_hash FROM users WHERE email = $1',
-      [email]
+      'SELECT id, username, chips, password_hash FROM users WHERE LOWER(username) = LOWER($1) OR LOWER(email) = LOWER($1)',
+      [identifier.trim()]
     );
 
     const user = result.rows[0];
     if (!user) {
-      res.status(401).json({ error: 'Invalid credentials' });
+      res.status(401).json({ error: 'Username atau password salah' });
       return;
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password_hash);
     if (!passwordMatch) {
-      res.status(401).json({ error: 'Invalid credentials' });
+      res.status(401).json({ error: 'Username atau password salah' });
       return;
     }
 
@@ -91,7 +106,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
     res.json({ id: user.id, username: user.username, chips: user.chips });
   } catch (err) {
     console.error('Login error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    res.status(500).json({ error: 'Terjadi kesalahan pada server' });
   }
 });
 

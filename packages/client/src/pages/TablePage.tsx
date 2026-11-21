@@ -75,6 +75,16 @@ export default function TablePage() {
     navigate('/lobby');
   };
 
+  const handleAddBot = () => {
+    const socket = getSocket();
+    socket.emit('table:addBot');
+  };
+
+  const handleRemoveBot = () => {
+    const socket = getSocket();
+    socket.emit('table:removeBot');
+  };
+
   const handleSendChat = (message: string) => {
     const socket = getSocket();
     socket.emit('chat:message', { message });
@@ -105,6 +115,8 @@ export default function TablePage() {
         myUserId={user?.id || ''}
         onAction={handleAction}
         onLeave={handleLeave}
+        onAddBot={handleAddBot}
+        onRemoveBot={handleRemoveBot}
         onSendChat={handleSendChat}
         chatMessages={chatMessages}
       />

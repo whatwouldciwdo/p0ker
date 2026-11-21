@@ -128,11 +128,11 @@ class HybridPool {
       };
     }
 
-    // 5. Login lookup: SELECT id, username, password_hash, chips FROM users WHERE email = $1
-    if (lower.startsWith('select') && lower.includes('from users') && lower.includes('where email =')) {
-      const email = params[0];
+    // 5. Login lookup: SELECT id, username, password_hash, chips FROM users WHERE ...
+    if (lower.startsWith('select') && lower.includes('from users') && lower.includes('where')) {
+      const ident = String(params[0]).toLowerCase();
       for (const u of memoryUsers.values()) {
-        if (u.email.toLowerCase() === email.toLowerCase()) {
+        if (u.username.toLowerCase() === ident || (u.email && u.email.toLowerCase() === ident)) {
           return {
             rows: [{ id: u.id, username: u.username, password_hash: u.password_hash, chips: u.chips } as unknown as T],
             rowCount: 1,

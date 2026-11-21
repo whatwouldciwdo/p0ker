@@ -28,6 +28,7 @@ interface InternalPlayer {
   isSmallBlind: boolean;
   isBigBlind: boolean;
   hasActed: boolean;
+  isBot?: boolean;
 }
 
 // ─── Table class ───────────────────────────────────────────────────────────────
@@ -148,6 +149,63 @@ export class Table {
     return remainingChips;
   }
 
+  addBot(): { success: boolean; error?: string } {
+    if (this.players.size >= this.opts.maxPlayers) {
+      return { success: false, error: 'Meja sudah penuh' };
+    }
+
+    const BOT_NAMES = ['🤖 Bot Budi', '🤖 Bot Sarah', '🤖 Bot Shark', '🤖 Bot Rex', '🤖 Bot Maya', '🤖 Bot Ace', '🤖 Bot Luna', '🤖 Bot Jack'];
+    const usedNames = new Set(Array.from(this.players.values()).map((p) => p.username));
+    const availableName = BOT_NAMES.find((n) => !usedNames.has(n)) || `🤖 Bot ${Math.floor(Math.random() * 100)}`;
+
+    const botId = `bot-${uuidv4().slice(0, 8)}`;
+    const buyIn = this.opts.minBuyIn * 2;
+    const seat = this.nextAvailableSeat();
+
+    const player: InternalPlayer = {
+      userId: botId,
+      username: availableName,
+      seat,
+      chips: buyIn,
+      bet: 0,
+      totalBet: 0,
+      holeCards: [],
+      status: 'active',
+      isDealer: false,
+      isSmallBlind: false,
+      isBigBlind: false,
+      hasActed: false,
+      isBot: true,
+    };
+
+    this.players.set(botId, player);
+    this.seatOrder.push(botId);
+    this.seatOrder.sort((a, b) => this.players.get(a)!.seat - this.players.get(b)!.seat);
+
+    this.emit();
+
+    if (this.phase === 'waiting' && this.activePlayers().length >= 2) {
+      setTimeout(() => this.startRound(), 1000);
+    }
+
+    return { success: true };
+  }
+
+  removeBot(botId?: string): { success: boolean } {
+    let targetId = botId;
+    if (!targetId) {
+      for (const p of this.players.values()) {
+        if (p.isBot) {
+          targetId = p.userId;
+          break;
+        }
+      }
+    }
+    if (!targetId) return { success: false };
+    this.removePlayer(targetId);
+    return { success: true };
+  }
+
   handleAction(playerId: string, action: PlayerAction, amount?: number): void {
     if (this.currentPlayerUserId !== playerId) return;
     if (this.phase === 'waiting' || this.phase === 'showdown') return;
@@ -209,6 +267,7 @@ export class Table {
         isSmallBlind: p.isSmallBlind,
         isBigBlind: p.isBigBlind,
         hasActed: p.hasActed,
+        isBot: p.isBot || false,
       };
     });
 
@@ -694,8 +753,12 @@ export class Table {
     // Remove broke players
     for (const [uid, p] of this.players.entries()) {
       if (p.chips <= 0 && p.status !== 'disconnected') {
-        this.players.delete(uid);
-        this.seatOrder = this.seatOrder.filter((id) => id !== uid);
+        if (p.isBot) {
+          p.chips = this.opts.minBuyIn * 2;
+        } else {
+          this.players.delete(uid);
+          this.seatOrder = this.seatOrder.filter((id) => id !== uid);
+        }
       }
     }
 
@@ -728,10 +791,119 @@ export class Table {
     }
   }
 
+  private decideBotAction(bot: InternalPlayer): { action: PlayerAction; amount?: number } {
+    const toCall = Math.max(0, this.currentBet - bot.bet);
+    const canCheck = toCall === 0;
+
+    let handScore = 0; // 0 = weak, 1 = ok, 2 = strong, 3 = monster
+    if (this.communityCards.length === 0) {
+      // Pre-flop logic
+      const c1 = bot.holeCards[0];
+      const c2 = bot.holeCards[1];
+      if (c1 && c2) {
+        const isPair = c1.rank === c2.rank;
+        const isSuited = c1.suit === c2.suit;
+        const highRanks = ['10', 'J', 'Q', 'K', 'A'];
+        const isHigh = highRanks.includes(c1.rank) || highRanks.includes(c2.rank);
+
+        if (isPair && ['9', '10', 'J', 'Q', 'K', 'A'].includes(c1.rank)) handScore = 3;
+        else if (isPair) handScore = 2;
+        else if (highRanks.includes(c1.rank) && highRanks.includes(c2.rank)) handScore = 2;
+        else if (isHigh || isSuited) handScore = 1;
+        else handScore = 0;
+      }
+    } else {
+      // Post-flop logic using HandEvaluator
+      const evalResult = evaluateHand(bot.holeCards, this.communityCards);
+      const name = evalResult.name.toLowerCase();
+      if (
+        name.includes('straight flush') ||
+        name.includes('four of a kind') ||
+        name.includes('full house') ||
+        name.includes('flush') ||
+        name.includes('straight')
+      ) {
+        handScore = 3;
+      } else if (name.includes('three of a kind') || name.includes('two pair')) {
+        handScore = 2;
+      } else if (name.includes('pair')) {
+        handScore = 1;
+      } else {
+        handScore = 0;
+      }
+    }
+
+    const minRaise = Math.max(this.opts.bigBlind, this.currentBet * 2);
+
+    if (handScore === 3) {
+      // Monster hand: aggressive raise
+      if (bot.chips > toCall && Math.random() < 0.75) {
+        const raiseSize = Math.min(
+          bot.chips + bot.bet,
+          minRaise + Math.floor(this.opts.bigBlind * (1 + Math.random() * 2))
+        );
+        return { action: 'raise', amount: raiseSize };
+      }
+      return canCheck ? { action: 'check' } : { action: 'call' };
+    }
+
+    if (handScore === 2) {
+      // Good hand
+      if (bot.chips > toCall && Math.random() < 0.4 && toCall <= this.opts.bigBlind * 3) {
+        return { action: 'raise', amount: minRaise };
+      }
+      return canCheck ? { action: 'check' } : { action: 'call' };
+    }
+
+    if (handScore === 1) {
+      // Moderate hand: check if free, call small bet
+      if (canCheck) return { action: 'check' };
+      if (toCall <= this.opts.bigBlind * 2.5) {
+        return { action: 'call' };
+      }
+      return Math.random() < 0.25 ? { action: 'call' } : { action: 'fold' };
+    }
+
+    // Weak hand: check if free, else fold (with 10% bluff call)
+    if (canCheck) return { action: 'check' };
+    if (toCall <= this.opts.smallBlind && Math.random() < 0.3) {
+      return { action: 'call' };
+    }
+    return Math.random() < 0.1 ? { action: 'call' } : { action: 'fold' };
+  }
+
+  private triggerBotActionIfApplicable(): void {
+    if (!this.currentPlayerUserId) return;
+    const player = this.players.get(this.currentPlayerUserId);
+    if (!player || !player.isBot || player.status !== 'active') return;
+
+    const botId = player.userId;
+    // Human-like thinking time: 1.2s - 2.4s
+    const thinkTime = 1200 + Math.floor(Math.random() * 1200);
+
+    setTimeout(() => {
+      if (
+        this.currentPlayerUserId === botId &&
+        this.phase !== 'waiting' &&
+        this.phase !== 'showdown'
+      ) {
+        const decision = this.decideBotAction(player);
+        this.handleAction(botId, decision.action, decision.amount);
+      }
+    }, thinkTime);
+  }
+
   private startTurnTimer(): void {
     this.clearTurnTimer();
     if (!this.currentPlayerUserId) return;
     const playerId = this.currentPlayerUserId;
+
+    const player = this.players.get(playerId);
+    if (player && player.isBot) {
+      this.triggerBotActionIfApplicable();
+      return;
+    }
+
     this.turnTimer = setTimeout(() => {
       // Auto-fold
       if (this.currentPlayerUserId === playerId) {

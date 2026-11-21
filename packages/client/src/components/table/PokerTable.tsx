@@ -11,6 +11,8 @@ interface PokerTableProps {
   onAction: (action: PlayerAction, amount?: number) => void;
   onLeave: () => void;
   onSendChat?: (message: string) => void;
+  onAddBot?: () => void;
+  onRemoveBot?: () => void;
   chatMessages?: Array<{ username: string; message: string; timestamp: number }>;
 }
 
@@ -20,6 +22,8 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   onAction,
   onLeave,
   onSendChat,
+  onAddBot,
+  onRemoveBot,
   chatMessages = [],
 }) => {
   const [chatInput, setChatInput] = useState('');
@@ -63,19 +67,41 @@ export const PokerTable: React.FC<PokerTableProps> = ({
         </div>
 
         <div className="table-top-actions">
+          {tableState.players.length < (tableState.maxPlayers || 9) && (
+            <button
+              type="button"
+              className="btn btn-primary btn-add-bot"
+              onClick={onAddBot}
+              title="Tambah Bot AI ke meja"
+            >
+              🤖 + Bot
+            </button>
+          )}
+
+          {tableState.players.some((p) => p.isBot) && (
+            <button
+              type="button"
+              className="btn btn-outline btn-remove-bot"
+              onClick={onRemoveBot}
+              title="Keluarkan 1 Bot AI"
+            >
+              - Bot
+            </button>
+          )}
+
           <button
             type="button"
             className="btn btn-secondary btn-chat-toggle"
             onClick={() => setShowChat(!showChat)}
           >
-            💬 Chat
+            💬
           </button>
           <button
             type="button"
             className="btn btn-danger btn-leave"
             onClick={onLeave}
           >
-            Leave Table
+            Keluar
           </button>
         </div>
       </header>

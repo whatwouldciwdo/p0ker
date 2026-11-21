@@ -29,6 +29,7 @@ export interface PlayerState {
   isSmallBlind: boolean;
   isBigBlind: boolean;
   hasActed: boolean;
+  isBot?: boolean;
   avatar?: string;
 }
 
@@ -132,6 +133,8 @@ export interface ClientToServerEvents {
   // Table
   'table:join': (data: any, buyIn?: number) => void;
   'table:leave': () => void;
+  'table:addBot': () => void;
+  'table:removeBot': (data?: { botId?: string }) => void;
   'table:sitOut': () => void;
   'table:sitIn': () => void;
   'table:action': (data: any, amount?: number) => void;

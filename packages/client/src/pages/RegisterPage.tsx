@@ -7,7 +7,6 @@ export default function RegisterPage() {
   const navigate = useNavigate();
   const setUser = useAuthStore((s) => s.setUser);
   const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -17,7 +16,7 @@ export default function RegisterPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/api/auth/register', { username, email, password });
+      const res = await api.post('/api/auth/register', { username, password });
       const { id, username: uname, chips } = res.data;
       setUser({ id, username: uname, chips });
       navigate('/lobby');
@@ -38,7 +37,7 @@ export default function RegisterPage() {
           <h1>P0ker</h1>
           <span className="logo-suit red">♥</span>
         </div>
-        <h2>Daftar</h2>
+        <h2>Buat Akun Baru</h2>
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
@@ -47,21 +46,11 @@ export default function RegisterPage() {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="nama_pemain"
+              placeholder="Contoh: RajaPoker"
               required
               minLength={3}
-              maxLength={30}
+              maxLength={20}
               autoFocus
-            />
-          </div>
-          <div className="form-group">
-            <label>Email</label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@contoh.com"
-              required
             />
           </div>
           <div className="form-group">
@@ -70,13 +59,13 @@ export default function RegisterPage() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="min. 8 karakter"
+              placeholder="Minimal 6 karakter"
               required
-              minLength={8}
+              minLength={6}
             />
           </div>
           <button type="submit" className="btn btn-primary" disabled={loading}>
-            {loading ? 'Memuat...' : 'Daftar'}
+            {loading ? 'Membuat Akun...' : 'Daftar Sekarang'}
           </button>
         </form>
         <p className="auth-link">

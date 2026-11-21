@@ -63,6 +63,7 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
     >
       {/* Dealer / Blind Badges */}
       <div className="badge-bar">
+        {player.isBot && <span className="badge badge-bot">AI</span>}
         {player.isDealer && <span className="badge badge-dealer">D</span>}
         {player.isSmallBlind && <span className="badge badge-blind">SB</span>}
         {player.isBigBlind && <span className="badge badge-blind">BB</span>}

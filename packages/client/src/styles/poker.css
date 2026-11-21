@@ -1205,3 +1205,251 @@ body, html {
   color: #fff;
   border: 1px solid #ef4444;
 }
+
+/* ==========================================================================
+   MOBILE & RESPONSIVE STYLES
+   ========================================================================== */
+
+.badge-bot {
+  background: #9333ea;
+  color: #fff;
+}
+
+.btn-add-bot {
+  background: linear-gradient(135deg, #a855f7, #7c3aed);
+  color: #fff;
+  padding: 6px 12px;
+  font-size: 0.85rem;
+}
+.btn-add-bot:hover {
+  filter: brightness(1.2);
+}
+
+.btn-remove-bot {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+@media (max-width: 900px) {
+  .poker-oval-felt {
+    width: 92vw;
+    height: 420px;
+    border-width: 14px;
+    border-radius: 210px;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Navbar */
+  .lobby-navbar {
+    padding: 0.8rem 1rem;
+  }
+  .navbar-brand h1 {
+    font-size: 1.1rem;
+  }
+  .user-profile .user-name {
+    display: none;
+  }
+  .user-chips-pill {
+    padding: 4px 10px;
+    font-size: 0.85rem;
+  }
+
+  /* Lobby */
+  .lobby-content {
+    padding: 1.5rem 1rem;
+  }
+  .lobby-header-actions {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .lobby-header-actions h2 {
+    font-size: 1.4rem;
+  }
+  .btn-create-table {
+    width: 100%;
+  }
+  .tables-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Table Header */
+  .table-top-bar {
+    padding: 0.5rem 0.8rem;
+  }
+  .room-title {
+    font-size: 0.95rem;
+  }
+  .blinds-badge {
+    display: none;
+  }
+  .phase-badge {
+    font-size: 0.65rem;
+    padding: 2px 6px;
+  }
+  .table-top-actions .btn {
+    padding: 5px 8px;
+    font-size: 0.75rem;
+  }
+
+  /* Table Arena */
+  .poker-arena {
+    padding: 0.5rem;
+  }
+  .poker-oval-felt {
+    width: 98vw;
+    height: 380px;
+    border-width: 10px;
+    border-radius: 190px;
+  }
+  .table-rail-inner {
+    inset: 6px;
+    border-radius: 180px;
+  }
+
+  /* Center Stage */
+  .table-center-stage {
+    gap: 10px;
+  }
+  .pot-pill {
+    padding: 4px 12px;
+    font-size: 0.9rem;
+  }
+  .card-slot {
+    width: 38px;
+    height: 56px;
+  }
+  .card-slot .poker-card {
+    width: 38px;
+    height: 56px;
+  }
+  .card-slot .card-rank {
+    font-size: 0.7rem;
+  }
+  .card-slot .card-suit {
+    font-size: 0.65rem;
+  }
+  .card-slot .card-center {
+    font-size: 1rem;
+  }
+
+  /* Seats on Mobile */
+  .player-seat {
+    width: 68px;
+  }
+  .avatar-wrapper {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 2px;
+  }
+  .timer-svg {
+    inset: -4px;
+    width: 46px;
+    height: 46px;
+  }
+  .player-card-info {
+    padding: 2px 4px;
+    border-radius: 6px;
+  }
+  .player-name {
+    font-size: 0.62rem;
+  }
+  .player-chips {
+    font-size: 0.62rem;
+  }
+  .card-mini {
+    width: 28px;
+    height: 40px;
+  }
+  .card-mini .card-rank {
+    font-size: 0.55rem;
+  }
+  .card-mini .card-suit {
+    font-size: 0.5rem;
+  }
+  .card-mini .card-center {
+    font-size: 0.75rem;
+  }
+  .seat-bet-chip {
+    padding: 1px 5px;
+    font-size: 0.6rem;
+  }
+  .btn-sit-here {
+    padding: 4px 8px;
+    border-radius: 8px;
+  }
+  .btn-sit-here .seat-label {
+    font-size: 0.65rem;
+  }
+
+  /* Action Dock */
+  .action-dock-container {
+    padding: 0.3rem 0.5rem;
+  }
+  .action-dock {
+    padding: 0.6rem 0.8rem;
+    gap: 6px;
+    border-radius: 12px;
+  }
+  .btn-action {
+    padding: 10px 4px;
+    font-size: 0.8rem;
+  }
+  .btn-preset {
+    padding: 4px 2px;
+    font-size: 0.65rem;
+  }
+  .raise-preview {
+    font-size: 0.85rem;
+  }
+
+  /* Modals */
+  .modal-card {
+    padding: 1.2rem;
+    max-width: 95vw;
+  }
+  .form-row {
+    grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  /* Chat Drawer on Mobile */
+  .chat-drawer {
+    width: calc(100vw - 32px);
+    right: 16px;
+    left: 16px;
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .poker-oval-felt {
+    height: 330px;
+    border-width: 8px;
+    border-radius: 165px;
+  }
+  .player-seat {
+    width: 58px;
+  }
+  .avatar-wrapper {
+    width: 32px;
+    height: 32px;
+  }
+  .player-avatar {
+    font-size: 0.7rem;
+  }
+  .card-slot {
+    width: 32px;
+    height: 48px;
+  }
+  .card-slot .poker-card {
+    width: 32px;
+    height: 48px;
+  }
+  .card-mini {
+    width: 24px;
+    height: 34px;
+  }
+}

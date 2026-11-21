@@ -6,7 +6,7 @@ import { useAuthStore } from '../store/authStore';
 export default function LoginPage() {
   const navigate = useNavigate();
   const setUser = useAuthStore((s) => s.setUser);
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -16,14 +16,14 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      const res = await api.post('/api/auth/login', { email, password });
-      const { id, username, chips } = res.data;
-      setUser({ id, username, chips });
+      const res = await api.post('/api/auth/login', { username, password });
+      const { id, username: uname, chips } = res.data;
+      setUser({ id, username: uname, chips });
       navigate('/lobby');
     } catch (err: unknown) {
       const data = (err as any)?.response?.data;
       const msg = data?.error || data?.message;
-      setError(msg || 'Login gagal. Periksa email dan password.');
+      setError(msg || 'Login gagal. Periksa username dan password.');
     } finally {
       setLoading(false);
     }
@@ -37,16 +37,16 @@ export default function LoginPage() {
           <h1>P0ker</h1>
           <span className="logo-suit red">♥</span>
         </div>
-        <h2>Masuk</h2>
+        <h2>Masuk ke Permainan</h2>
         {error && <div className="auth-error">{error}</div>}
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label>Email</label>
+            <label>Username</label>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="email@contoh.com"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Masukkan username Anda"
               required
               autoFocus
             />
@@ -66,7 +66,7 @@ export default function LoginPage() {
           </button>
         </form>
         <p className="auth-link">
-          Belum punya akun? <Link to="/register">Daftar</Link>
+          Belum punya akun? <Link to="/register">Daftar Tanpa Email</Link>
         </p>
       </div>
     </div>

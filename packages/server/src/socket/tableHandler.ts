@@ -161,6 +161,45 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
   socket.on('table:action', handlePlayerAction);
   socket.on('game:action', handlePlayerAction);
 
+  // ── table:addBot ────────────────────────────────────────────────────────────
+  socket.on('table:addBot', async () => {
+    try {
+      const tableId: string | undefined = socket.data.tableId;
+      if (!tableId) return;
+
+      const tableManager = TableManager.getInstance();
+      const table = tableManager.getTable(tableId);
+      if (!table) return;
+
+      const res = table.addBot();
+      if (!res.success) {
+        socket.emit('error', res.error || 'Gagal menambahkan bot');
+        return;
+      }
+
+      await broadcastToTable(io, tableId);
+    } catch (err) {
+      console.error('table:addBot error:', err);
+    }
+  });
+
+  // ── table:removeBot ─────────────────────────────────────────────────────────
+  socket.on('table:removeBot', async (data?: { botId?: string }) => {
+    try {
+      const tableId: string | undefined = socket.data.tableId;
+      if (!tableId) return;
+
+      const tableManager = TableManager.getInstance();
+      const table = tableManager.getTable(tableId);
+      if (!table) return;
+
+      table.removeBot(data?.botId);
+      await broadcastToTable(io, tableId);
+    } catch (err) {
+      console.error('table:removeBot error:', err);
+    }
+  });
+
   // ── table:chat ──────────────────────────────────────────────────────────────
   socket.on('table:chat', (message: string) => {
     const tableId: string | undefined = socket.data.tableId;
