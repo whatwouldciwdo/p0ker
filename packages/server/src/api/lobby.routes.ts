@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { cookieAuthMiddleware } from '../middleware/auth';
 import { tableManager } from '../engine/TableManager';
+import { broadcastToTable } from '../socket/tableHandler';
 
 const router = Router();
 
@@ -61,6 +62,59 @@ router.post('/tables', (req: Request, res: Response): void => {
   } catch (err) {
     console.error('Create table error:', err);
     res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// POST /api/lobby/tables/:tableId/bot - Add a bot to table
+router.post('/tables/:tableId/bot', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const tableId = String(req.params.tableId);
+    const table = tableManager.getTable(tableId);
+    if (!table) {
+      res.status(404).json({ error: 'Meja tidak ditemukan' });
+      return;
+    }
+
+    const result = table.addBot();
+    if (!result.success) {
+      res.status(400).json({ error: result.error || 'Gagal menambahkan bot' });
+      return;
+    }
+
+    const io = tableManager.getIO();
+    if (io) {
+      io.to(tableId).emit('toast', '🤖 Bot AI berhasil ditambahkan!', 'success');
+      await broadcastToTable(io, tableId);
+    }
+
+    res.json({ success: true });
+  } catch (err: any) {
+    console.error('Add bot API error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
+  }
+});
+
+// DELETE /api/lobby/tables/:tableId/bot - Remove a bot from table
+router.delete('/tables/:tableId/bot', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const tableId = String(req.params.tableId);
+    const table = tableManager.getTable(tableId);
+    if (!table) {
+      res.status(404).json({ error: 'Meja tidak ditemukan' });
+      return;
+    }
+
+    const result = table.removeBot();
+    const io = tableManager.getIO();
+    if (io) {
+      io.to(tableId).emit('toast', 'Bot AI telah dikeluarkan.', 'info');
+      await broadcastToTable(io, tableId);
+    }
+
+    res.json(result);
+  } catch (err: any) {
+    console.error('Remove bot API error:', err);
+    res.status(500).json({ error: err.message || 'Internal server error' });
   }
 });
 

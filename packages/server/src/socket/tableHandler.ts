@@ -205,6 +205,8 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
         }
       }
 
+      console.log(`[Socket table:addBot] user=${username} tableId=${tableId}`);
+
       if (!tableId) {
         socket.emit('error', 'Table ID tidak ditemukan. Silakan refresh halaman meja.');
         return;
@@ -216,11 +218,13 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
       const tableManager = TableManager.getInstance();
       const table = tableManager.getTable(tableId);
       if (!table) {
+        console.warn(`[Socket table:addBot] table ${tableId} not found`);
         socket.emit('error', 'Table tidak ditemukan.');
         return;
       }
 
       const res = table.addBot();
+      console.log(`[Socket table:addBot] addBot result:`, res);
       if (!res.success) {
         socket.emit('error', res.error || 'Gagal menambahkan bot');
         return;

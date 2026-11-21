@@ -4,6 +4,7 @@ import { TableState, PlayerAction } from '@p0ker/shared';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
 import { getSocket } from '../socket/socketClient';
+import { api } from '../api/axios';
 import PokerTable from '../components/table/PokerTable';
 
 interface ChatMessage {
@@ -83,14 +84,34 @@ export default function TablePage() {
     navigate('/lobby');
   };
 
-  const handleAddBot = () => {
-    const socket = getSocket();
-    socket.emit('table:addBot', { tableId });
+  const handleAddBot = async () => {
+    try {
+      const socket = getSocket();
+      socket.emit('table:addBot', { tableId });
+      // Call REST API endpoint as guaranteed dual-channel
+      const res = await api.post(`/api/lobby/tables/${tableId}/bot`);
+      if (res.data?.success) {
+        setNotification('🤖 Bot AI berhasil ditambahkan!');
+        setTimeout(() => setNotification(null), 3000);
+      }
+    } catch (err: any) {
+      console.error('handleAddBot error:', err);
+      const msg = err.response?.data?.error || err.message || 'Gagal menambahkan bot';
+      setErrorMessage(msg);
+      setTimeout(() => setErrorMessage(null), 4000);
+    }
   };
 
-  const handleRemoveBot = () => {
-    const socket = getSocket();
-    socket.emit('table:removeBot', { tableId });
+  const handleRemoveBot = async () => {
+    try {
+      const socket = getSocket();
+      socket.emit('table:removeBot', { tableId });
+      await api.delete(`/api/lobby/tables/${tableId}/bot`);
+      setNotification('Bot AI telah dikeluarkan.');
+      setTimeout(() => setNotification(null), 3000);
+    } catch (err: any) {
+      console.error('handleRemoveBot error:', err);
+    }
   };
 
   const handleSendChat = (message: string) => {
