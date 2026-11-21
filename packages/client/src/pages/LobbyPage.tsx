@@ -23,6 +23,8 @@ export default function LobbyPage() {
   const [bigBlind, setBigBlind] = useState(20);
   const [maxPlayers, setMaxPlayers] = useState(6);
   const [minBuyIn, setMinBuyIn] = useState(200);
+  const [allowBots, setAllowBots] = useState(true);
+  const [initialBots, setInitialBots] = useState(1);
   const [createError, setCreateError] = useState('');
 
   // Fetch tables and current user
@@ -109,6 +111,8 @@ export default function LobbyPage() {
         bigBlind: Number(bigBlind),
         maxPlayers: Number(maxPlayers),
         minBuyIn: Number(minBuyIn),
+        allowBots,
+        initialBots: allowBots ? Number(initialBots) : 0,
       };
 
       const res = await api.post('/api/lobby/tables', opts);
@@ -183,7 +187,12 @@ export default function LobbyPage() {
               return (
                 <div key={table.tableId} className="table-card">
                   <div className="table-card-top">
-                    <span className="table-name">{table.name}</span>
+                    <div className="table-title-group">
+                      <span className="table-name">{table.name}</span>
+                      <span className={`mode-badge ${table.allowBots !== false ? 'mode-bot' : 'mode-human'}`}>
+                        {table.allowBots !== false ? '🤖 Bot AI' : '👥 Khusus Manusia'}
+                      </span>
+                    </div>
                     <span className={`status-pill ${table.phase === 'waiting' ? 'status-waiting' : 'status-live'}`}>
                       {table.phase === 'waiting' ? 'Menunggu' : 'Bermain'}
                     </span>
@@ -299,6 +308,43 @@ export default function LobbyPage() {
                   />
                 </div>
               </div>
+
+              {/* Pilihan Bot atau Bukan Bot */}
+              <div className="form-group">
+                <label>Mode Bot AI</label>
+                <div className="bot-mode-selector">
+                  <button
+                    type="button"
+                    className={`btn-mode-tab ${allowBots ? 'active' : ''}`}
+                    onClick={() => setAllowBots(true)}
+                  >
+                    🤖 Izinkan Bot AI
+                  </button>
+                  <button
+                    type="button"
+                    className={`btn-mode-tab ${!allowBots ? 'active' : ''}`}
+                    onClick={() => setAllowBots(false)}
+                  >
+                    👥 Khusus Manusia
+                  </button>
+                </div>
+              </div>
+
+              {allowBots && (
+                <div className="form-group">
+                  <label>Jumlah Bot AI Otomatis Masuk:</label>
+                  <select
+                    value={initialBots}
+                    onChange={(e) => setInitialBots(Number(e.target.value))}
+                  >
+                    <option value={0}>0 (Mulai kosong, tambah bot manual nanti)</option>
+                    <option value={1}>1 Bot AI (Langsung main Heads-up)</option>
+                    <option value={2}>2 Bot AI (3 pemain)</option>
+                    <option value={3}>3 Bot AI (4 pemain)</option>
+                    <option value={5}>5 Bot AI (Meja penuh 6-Max)</option>
+                  </select>
+                </div>
+              )}
 
               <div className="modal-actions">
                 <button

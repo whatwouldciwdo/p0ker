@@ -62,6 +62,7 @@ export interface TableState {
   maxPlayers: number;
   timeoutSeconds: number;
   winners: WinnerInfo[] | null;
+  allowBots?: boolean;
 }
 
 export interface LobbyTable {
@@ -73,6 +74,7 @@ export interface LobbyTable {
   bigBlind: number;
   minBuyIn: number;
   phase: GamePhase;
+  allowBots?: boolean;
 }
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
@@ -91,6 +93,8 @@ export interface CreateTableOptions {
   bigBlind: number;
   maxPlayers: number;
   minBuyIn: number;
+  allowBots?: boolean;
+  initialBots?: number;
 }
 
 // ─── Socket.io Typed Events ───────────────────────────────────────────────────

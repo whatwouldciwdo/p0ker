@@ -67,7 +67,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
         </div>
 
         <div className="table-top-actions">
-          {tableState.players.length < (tableState.maxPlayers || 9) && (
+          {tableState.allowBots !== false && tableState.players.length < (tableState.maxPlayers || 9) && (
             <button
               type="button"
               className="btn btn-primary btn-add-bot"
@@ -78,7 +78,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
             </button>
           )}
 
-          {tableState.players.some((p) => p.isBot) && (
+          {tableState.allowBots !== false && tableState.players.some((p) => p.isBot) && (
             <button
               type="button"
               className="btn btn-outline btn-remove-bot"
@@ -87,6 +87,12 @@ export const PokerTable: React.FC<PokerTableProps> = ({
             >
               - Bot
             </button>
+          )}
+
+          {tableState.allowBots === false && (
+            <span className="badge badge-human-only" title="Meja murni pemain manusia">
+              👥 Khusus Manusia
+            </span>
           )}
 
           <button

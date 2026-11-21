@@ -55,6 +55,8 @@ export class Table {
   private lastRaiseSize: number = 0;
   private currentBet: number = 0;
 
+  readonly allowBots: boolean;
+
   constructor(
     tableId: string,
     opts: CreateTableOptions,
@@ -62,7 +64,15 @@ export class Table {
   ) {
     this.tableId = tableId;
     this.opts = opts;
+    this.allowBots = opts.allowBots !== false;
     this.onStateChange = onStateChange;
+
+    if (this.allowBots && opts.initialBots && opts.initialBots > 0) {
+      const count = Math.min(opts.initialBots, opts.maxPlayers - 1);
+      for (let i = 0; i < count; i++) {
+        this.addBot();
+      }
+    }
   }
 
   get id(): string {
@@ -150,6 +160,9 @@ export class Table {
   }
 
   addBot(): { success: boolean; error?: string } {
+    if (!this.allowBots) {
+      return { success: false, error: 'Meja ini khusus pemain manusia (bot tidak diizinkan)' };
+    }
     if (this.players.size >= this.opts.maxPlayers) {
       return { success: false, error: 'Meja sudah penuh' };
     }
@@ -292,6 +305,7 @@ export class Table {
       maxPlayers: this.opts.maxPlayers,
       timeoutSeconds: 30,
       winners: this.winners,
+      allowBots: this.allowBots,
     };
   }
 
@@ -371,6 +385,7 @@ export class Table {
       bigBlind: this.opts.bigBlind,
       minBuyIn: this.opts.minBuyIn,
       phase: this.phase,
+      allowBots: this.allowBots,
     };
   }
 

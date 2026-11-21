@@ -21,7 +21,7 @@ router.get('/tables', (req: Request, res: Response): void => {
 // POST /api/lobby/tables
 router.post('/tables', (req: Request, res: Response): void => {
   try {
-    const { name, smallBlind, bigBlind, maxPlayers, minBuyIn } = req.body;
+    const { name, smallBlind, bigBlind, maxPlayers, minBuyIn, allowBots, initialBots } = req.body;
 
     if (!name || smallBlind == null || bigBlind == null || maxPlayers == null || minBuyIn == null) {
       res.status(400).json({ error: 'name, smallBlind, bigBlind, maxPlayers, minBuyIn are required' });
@@ -45,7 +45,15 @@ router.post('/tables', (req: Request, res: Response): void => {
     }
 
     const table = tableManager.createTable(
-      { name, smallBlind, bigBlind, maxPlayers, minBuyIn },
+      {
+        name,
+        smallBlind: Number(smallBlind),
+        bigBlind: Number(bigBlind),
+        maxPlayers: Number(maxPlayers),
+        minBuyIn: Number(minBuyIn),
+        allowBots: allowBots !== false,
+        initialBots: Number(initialBots) || 0,
+      },
       () => {} // onStateChange placeholder; socket layer handles broadcasts
     );
 
