@@ -91,6 +91,27 @@ export default function LobbyPage() {
     navigate(`/table/${selectedTable.tableId}?buyIn=${buyInAmount}`);
   };
 
+  const handleDeleteTable = async (tableId: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!window.confirm('Yakin ingin menghapus meja ini?')) return;
+    try {
+      await api.delete(`/api/lobby/tables/${tableId}`);
+      fetchTables();
+    } catch (err: any) {
+      console.error('Delete table error', err);
+    }
+  };
+
+  const handleClearAllTables = async () => {
+    if (!window.confirm('Hapus SEMUA meja yang ada di lobi?')) return;
+    try {
+      await api.delete('/api/lobby/tables');
+      fetchTables();
+    } catch (err: any) {
+      console.error('Clear tables error', err);
+    }
+  };
+
   const handleCreateSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setCreateError('');
@@ -162,12 +183,24 @@ export default function LobbyPage() {
             <p className="subtitle">Pilih meja yang tersedia atau buat meja dengan aturan Anda sendiri.</p>
           </div>
 
-          <button
-            className="btn btn-primary btn-create-table"
-            onClick={() => setShowCreateModal(true)}
-          >
-            + Buat Meja Baru
-          </button>
+          <div style={{ display: 'flex', gap: '10px' }}>
+            {lobbyTables.length > 0 && (
+              <button
+                className="btn btn-outline btn-sm"
+                onClick={handleClearAllTables}
+                style={{ borderColor: '#ef4444', color: '#ef4444' }}
+                title="Hapus semua meja yang ada"
+              >
+                🗑️ Hapus Semua Meja
+              </button>
+            )}
+            <button
+              className="btn btn-primary btn-create-table"
+              onClick={() => setShowCreateModal(true)}
+            >
+              + Buat Meja Baru
+            </button>
+          </div>
         </div>
 
         {/* Tables Grid */}
@@ -213,13 +246,23 @@ export default function LobbyPage() {
                     </div>
                   </div>
 
-                  <div className="table-card-footer">
+                  <div className="table-card-footer" style={{ display: 'flex', gap: '8px' }}>
                     <button
                       className="btn btn-primary btn-join-table"
+                      style={{ flex: 1 }}
                       disabled={isFull}
                       onClick={() => handleOpenBuyIn(table)}
                     >
                       {isFull ? 'Penuh' : 'Bergabung'}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      style={{ borderColor: '#ef4444', color: '#ef4444', padding: '0 12px' }}
+                      title="Hapus Meja Ini"
+                      onClick={(e) => handleDeleteTable(table.tableId, e)}
+                    >
+                      🗑️
                     </button>
                   </div>
                 </div>

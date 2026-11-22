@@ -65,11 +65,42 @@ router.post('/tables', (req: Request, res: Response): void => {
   }
 });
 
+// DELETE /api/lobby/tables - Delete all tables
+router.delete('/tables', (req: Request, res: Response): void => {
+  try {
+    tableManager.clearAllTables();
+    res.json({ success: true, message: 'Semua meja berhasil dihapus' });
+  } catch (err: any) {
+    console.error('Clear tables error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// DELETE /api/lobby/tables/:tableId - Delete specific table
+router.delete('/tables/:tableId', (req: Request, res: Response): void => {
+  try {
+    const tableId = String(req.params.tableId);
+    const deleted = tableManager.deleteTable(tableId);
+    if (!deleted) {
+      res.status(404).json({ error: 'Meja tidak ditemukan' });
+      return;
+    }
+    res.json({ success: true, message: 'Meja berhasil dihapus' });
+  } catch (err: any) {
+    console.error('Delete table error:', err);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // POST /api/lobby/tables/:tableId/bot - Add a bot to table
 router.post('/tables/:tableId/bot', async (req: Request, res: Response): Promise<void> => {
   try {
     const tableId = String(req.params.tableId);
     const table = tableManager.getTable(tableId);
+    if (!table) {
+      res.status(404).json({ error: 'Meja tidak ditemukan' });
+      return;
+    }
 
     const result = table.addBot();
     if (!result.success) {
@@ -95,6 +126,10 @@ router.delete('/tables/:tableId/bot', async (req: Request, res: Response): Promi
   try {
     const tableId = String(req.params.tableId);
     const table = tableManager.getTable(tableId);
+    if (!table) {
+      res.status(404).json({ error: 'Meja tidak ditemukan' });
+      return;
+    }
 
     const result = table.removeBot();
     const io = tableManager.getIO();
