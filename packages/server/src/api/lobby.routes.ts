@@ -70,10 +70,6 @@ router.post('/tables/:tableId/bot', async (req: Request, res: Response): Promise
   try {
     const tableId = String(req.params.tableId);
     const table = tableManager.getTable(tableId);
-    if (!table) {
-      res.status(404).json({ error: 'Meja tidak ditemukan' });
-      return;
-    }
 
     const result = table.addBot();
     if (!result.success) {
@@ -99,10 +95,6 @@ router.delete('/tables/:tableId/bot', async (req: Request, res: Response): Promi
   try {
     const tableId = String(req.params.tableId);
     const table = tableManager.getTable(tableId);
-    if (!table) {
-      res.status(404).json({ error: 'Meja tidak ditemukan' });
-      return;
-    }
 
     const result = table.removeBot();
     const io = tableManager.getIO();
