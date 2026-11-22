@@ -51,8 +51,21 @@ export class TableManager {
     return this.createTableWithId(tableId, opts, onStateChange);
   }
 
-  public getTable(tableId: string): Table | undefined {
-    return this.tables.get(tableId);
+  public getTable(tableId: string): Table {
+    let table = this.tables.get(tableId);
+    if (!table) {
+      console.log(`[TableManager] Auto-restoring table ${tableId}`);
+      table = this.createTableWithId(tableId, {
+        name: `Poker Table`,
+        smallBlind: 10,
+        bigBlind: 20,
+        maxPlayers: 6,
+        minBuyIn: 200,
+        allowBots: true,
+        initialBots: 0,
+      });
+    }
+    return table;
   }
 
   public deleteTable(tableId: string): boolean {

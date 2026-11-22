@@ -85,18 +85,20 @@ export default function TablePage() {
   };
 
   const handleAddBot = async () => {
+    const currentTableId = tableId || tableState?.tableId;
+    if (!currentTableId) return;
+
     try {
-      // Primary: REST API (goes through proxy → server)
-      const res = await api.post(`/api/lobby/tables/${tableId}/bot`);
+      const socket = getSocket();
+      socket.emit('table:addBot', { tableId: currentTableId });
+
+      const res = await api.post(`/api/lobby/tables/${currentTableId}/bot`);
       if (res.data?.success) {
         setNotification('🤖 Bot AI berhasil ditambahkan!');
         setTimeout(() => setNotification(null), 3000);
       }
     } catch (err: any) {
       console.error('handleAddBot error:', err);
-      // Fallback: try socket
-      const socket = getSocket();
-      socket.emit('table:addBot', { tableId });
       const msg = err.response?.data?.error || err.message || 'Gagal menambahkan bot';
       setErrorMessage(msg);
       setTimeout(() => setErrorMessage(null), 4000);
@@ -104,14 +106,17 @@ export default function TablePage() {
   };
 
   const handleRemoveBot = async () => {
+    const currentTableId = tableId || tableState?.tableId;
+    if (!currentTableId) return;
+
     try {
-      await api.delete(`/api/lobby/tables/${tableId}/bot`);
+      const socket = getSocket();
+      socket.emit('table:removeBot', { tableId: currentTableId });
+      await api.delete(`/api/lobby/tables/${currentTableId}/bot`);
       setNotification('Bot AI telah dikeluarkan.');
       setTimeout(() => setNotification(null), 3000);
     } catch (err: any) {
       console.error('handleRemoveBot error:', err);
-      const socket = getSocket();
-      socket.emit('table:removeBot', { tableId });
     }
   };
 
