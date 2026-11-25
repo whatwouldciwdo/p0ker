@@ -1,6 +1,5 @@
 import React from 'react';
 import { SidePot } from '@p0ker/shared';
-import { PokerChipIcon } from '../icons/CasinoIcons';
 
 interface PotDisplayProps {
   pot: number;
@@ -10,11 +9,10 @@ interface PotDisplayProps {
 
 export const PotDisplay: React.FC<PotDisplayProps> = ({ pot, sidePots = [] }) => {
   return (
-    <div className="pot-display-wrapper fc-pot-wrapper">
-      <div className="pot-pill fc-pot-pill">
-        <PokerChipIcon size={17} variant="blue" className="pot-icon" />
-        <span className="pot-label">TOTAL POT :</span>
-        <span className="pot-amount">${pot.toLocaleString()}</span>
+    <div className="pot-display-wrapper fc-pot-wrapper fc6-pot-wrapper">
+      <div className="fc6-pot-line">
+        <span className="fc6-pot-label">TOTAL POT :</span>
+        <span className="fc6-pot-amount">{pot.toLocaleString()}</span>
       </div>
 
       {sidePots.length > 0 && (

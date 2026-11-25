@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { PlayerAction } from '@p0ker/shared';
-import { FoldArrowIcon, RaiseArrowIcon } from '../icons/CasinoIcons';
 
 interface ActionDockProps {
   currentBet: number;
@@ -42,124 +41,118 @@ export const ActionDock: React.FC<ActionDockProps> = ({
   };
 
   const canRaise = myChips > toCall && maxRaise > currentBet;
+  const betLabel = currentBet === 0 ? 'BET' : 'RAISE';
 
   return (
-    <div className="action-dock-container fc-action-dock-container">
-      <div className="action-dock fc-action-dock">
-        {/* Raise Slider & Presets */}
-        {canRaise && (
-          <div className="raise-panel fc-raise-panel">
-            <div className="fc-raise-readout-row">
-              <span className="fc-raise-value">${raiseAmount.toLocaleString()}</span>
-            </div>
-
-            <div className="slider-row fc-slider-row">
-              <input
-                type="range"
-                className="raise-slider fc-raise-slider"
-                min={minRaise}
-                max={maxRaise}
-                step={bigBlind}
-                value={raiseAmount}
-                onChange={handleSliderChange}
-              />
-            </div>
-
-            <div className="presets-bar fc-presets-bar">
+    <div className="action-dock-container fc6-action-dock">
+      {/* Top Row: Presets (MIN, 3/4, POT, MAX) + Thin Mint Slider + Readout Box */}
+      {canRaise && (
+        <div className="fc6-bet-controls">
+          <div className="fc6-slider-column">
+            <div className="fc6-presets-row">
               <button
                 type="button"
-                className="btn-preset fc-preset-btn"
+                className="fc6-preset-pill"
                 onClick={() => setRaiseAmount(minRaise)}
               >
                 MIN
               </button>
               <button
                 type="button"
-                className="btn-preset fc-preset-btn"
-                onClick={() => setPresetRaise(0.5)}
+                className="fc6-preset-pill"
+                onClick={() => setPresetRaise(0.75)}
               >
-                1/2
+                3/4
               </button>
               <button
                 type="button"
-                className="btn-preset fc-preset-btn"
+                className="fc6-preset-pill"
                 onClick={() => setPresetRaise(1.0)}
               >
                 POT
               </button>
               <button
                 type="button"
-                className="btn-preset fc-preset-btn"
+                className="fc6-preset-pill"
                 onClick={() => setRaiseAmount(maxRaise)}
               >
                 MAX
               </button>
             </div>
-          </div>
-        )}
 
-        {/* Primary Action Buttons (FigCraft Coral Fold, Slate Check/Call, Sky Raise/All-In) */}
-        <div className="buttons-row fc-buttons-row">
+            <input
+              type="range"
+              className="fc6-range-slider"
+              min={minRaise}
+              max={maxRaise}
+              step={bigBlind}
+              value={raiseAmount}
+              onChange={handleSliderChange}
+            />
+          </div>
+
+          <div className="fc6-amount-box" title="Jumlah taruhan">
+            <span>{raiseAmount.toLocaleString()}</span>
+          </div>
+        </div>
+      )}
+
+      {/* Bottom Row: FOLD | CHECK | CALL | BET/RAISE */}
+      <div className="fc6-buttons-row">
+        <button
+          type="button"
+          className="fc6-btn fc6-btn-fold"
+          onClick={() => onAction('fold')}
+        >
+          FOLD
+        </button>
+
+        <button
+          type="button"
+          className="fc6-btn fc6-btn-slate"
+          disabled={!canCheck}
+          onClick={() => onAction('check')}
+        >
+          CHECK
+        </button>
+
+        <button
+          type="button"
+          className="fc6-btn fc6-btn-slate"
+          disabled={canCheck}
+          onClick={() => onAction('call')}
+        >
+          {canCheck ? 'CALL' : (
+            <span className="fc6-btn-stack">
+              <span>CALL</span>
+              <span className="fc6-btn-sub">{toCall.toLocaleString()}</span>
+            </span>
+          )}
+        </button>
+
+        {canRaise && raiseAmount > currentBet ? (
           <button
             type="button"
-            className="btn btn-action btn-fold fc-btn-fold"
-            onClick={() => onAction('fold')}
-            title="Fold"
+            className="fc6-btn fc6-btn-bet"
+            onClick={() => onAction('raise', raiseAmount)}
           >
-            <FoldArrowIcon size={15} />
-            <span>FOLD</span>
+            <span className="fc6-btn-stack">
+              <span>{betLabel}</span>
+              <span className="fc6-btn-sub">{raiseAmount.toLocaleString()}</span>
+            </span>
           </button>
-
-          {canCheck ? (
-            <button
-              type="button"
-              className="btn btn-action btn-check fc-btn-slate"
-              onClick={() => onAction('check')}
-            >
-              CHECK
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn btn-action btn-call fc-btn-slate"
-              onClick={() => onAction('call')}
-            >
-              CALL ${toCall.toLocaleString()}
-            </button>
-          )}
-
-          {canRaise && raiseAmount > currentBet ? (
-            <button
-              type="button"
-              className="btn btn-action btn-raise fc-btn-raise"
-              onClick={() => onAction('raise', raiseAmount)}
-              title={`Raise to $${raiseAmount.toLocaleString()}`}
-            >
-              <span>RAISE</span>
-              <RaiseArrowIcon size={15} />
-            </button>
-          ) : myChips > 0 ? (
-            <button
-              type="button"
-              className="btn btn-action btn-allin fc-btn-raise"
-              onClick={() => onAction('all-in')}
-            >
+        ) : myChips > 0 ? (
+          <button
+            type="button"
+            className="fc6-btn fc6-btn-bet"
+            onClick={() => onAction('all-in')}
+          >
+            <span className="fc6-btn-stack">
               <span>ALL-IN</span>
-              <RaiseArrowIcon size={15} />
-            </button>
-          ) : null}
-
-          {canRaise && myChips > 0 && (
-            <button
-              type="button"
-              className="btn btn-action btn-allin fc-btn-allin-pill"
-              onClick={() => onAction('all-in')}
-              title={`All-In ($${myChips.toLocaleString()})`}
-            >
-              ALL-IN
-            </button>
-          )}
-        </div>
+              <span className="fc6-btn-sub">{myChips.toLocaleString()}</span>
+            </span>
+          </button>
+        ) : null}
       </div>
     </div>
   );

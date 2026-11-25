@@ -1,0 +1,1188 @@
+/* ==========================================================================
+   FIGCRAFT DESKTOP FULL HD OVERHAUL (v6)
+   Exact slice of design.figcraft:
+   - Frame #11382: Poker UI Desktop Full HD_6 hand options + 2 cards UI Table changes2
+   - Frame #12364: Poker UI Desktop Full HD+high hand
+   - Frame #8841:  poker rooms+signup signin
+   Extracted Tokens:
+     Surface:  #11181A, #182025, #202A31, #303D46, #34424D, #374752, #40525E
+     Text:     #D9D9D9, #727F87
+     Coral:    #ED7483 (Fold / Hearts / Active timer)
+     Peach:    #EAA680 (Diamonds / Unread dot)
+     Mint:     #A7E8E6 / #7CDAD4 (Bet/Raise / Spades / Pot / Empty +)
+     Blue:     #7C9BFF (Clubs)
+     Font:     'Poppins', sans-serif
+   ========================================================================== */
+
+:root {
+  --fc6-bg-deep: #11181a;
+  --fc6-felt: #182025;
+  --fc6-rail: #232d35;
+  --fc6-plate: #202a31;
+  --fc6-plate-dark: #161e23;
+  --fc6-slate-1: #303d46;
+  --fc6-slate-2: #34424d;
+  --fc6-slate-3: #374752;
+  --fc6-slate-4: #40525e;
+  --fc6-muted: #727f87;
+  --fc6-text: #d9e2e8;
+  --fc6-coral: #ed7483;
+  --fc6-peach: #eaa680;
+  --fc6-mint: #a7e8e6;
+  --fc6-teal: #7cdad4;
+  --fc6-blue: #7c9bff;
+  --fc6-amber: #f3c16e;
+}
+
+body {
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* ==========================================================================
+   1. CANVAS & MATTE CHARCOAL BOARD (#11382)
+   ========================================================================== */
+
+.fc6-canvas {
+  width: 100%;
+  height: 100dvh;
+  background: radial-gradient(ellipse at 95% 5%, #3c4b57 0%, #131f25 75%, #0d1418 100%) !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 22px 28px;
+  overflow: hidden;
+}
+
+.fc6-board {
+  width: 100%;
+  max-width: 1320px;
+  height: 100%;
+  max-height: 780px;
+  border-radius: 10px !important;
+  position: relative;
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 0%, #36444e 0%, #1b242a 42%, #10191e 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06) !important;
+  box-shadow:
+    0 34px 80px rgba(4, 9, 13, 0.72),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07) !important;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ==========================================================================
+   2. TOP-LEFT & TOP-RIGHT MINIMAL CONTROLS + HIGH HAND POPOVER (#12364)
+   ========================================================================== */
+
+.fc6-top-left {
+  position: absolute;
+  top: 22px;
+  left: 24px;
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.fc6-nav-icons {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.fc6-icon-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 7px;
+  border: none;
+  background: transparent;
+  color: #6b7b85;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.fc6-icon-btn:hover,
+.fc6-icon-btn.is-active {
+  color: var(--fc6-mint);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.fc6-icon-btn.is-muted {
+  color: var(--fc6-coral);
+}
+
+.fc6-table-meta {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--fc6-muted);
+  letter-spacing: 0.3px;
+  padding-left: 4px;
+}
+
+.fc6-highhand-btn {
+  display: inline-flex;
+  align-items: stretch;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(32, 42, 49, 0.72);
+  border-radius: 3px;
+  padding: 0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: border-color 0.15s ease, filter 0.15s ease;
+}
+
+.fc6-highhand-btn:hover,
+.fc6-highhand-btn.is-active {
+  border-color: rgba(167, 232, 230, 0.45);
+}
+
+.fc6-highhand-icon {
+  width: 36px;
+  height: 34px;
+  background: var(--fc6-slate-4);
+  color: var(--fc6-mint);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.fc6-highhand-btn.is-active .fc6-highhand-icon {
+  background: var(--fc6-mint);
+  color: var(--fc6-bg-deep);
+}
+
+.fc6-highhand-label {
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--fc6-muted);
+}
+
+.fc6-highhand-popover {
+  margin-top: -6px;
+  width: 248px;
+  border-radius: 6px;
+  background: linear-gradient(180deg, #2d3942 0%, #172026 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.65);
+  overflow: hidden;
+}
+
+.fc6-hh-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 8px;
+  font-size: 0.76rem;
+  font-weight: 500;
+  color: #aebbc4;
+}
+
+.fc6-hh-close {
+  background: none;
+  border: none;
+  color: #727f87;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.fc6-hh-close:hover {
+  color: #fff;
+}
+
+.fc6-hh-cards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 10px 12px 14px;
+  min-height: 76px;
+}
+
+.fc6-hh-empty {
+  font-size: 0.74rem;
+  color: var(--fc6-muted);
+}
+
+.fc6-hh-footer {
+  background: rgba(15, 22, 26, 0.75);
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.fc6-hh-sub {
+  font-size: 0.66rem;
+  color: var(--fc6-muted);
+}
+
+.fc6-hh-timer {
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--fc6-teal);
+}
+
+.fc6-top-right {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  z-index: 35;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fc6-pill-ctrl {
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(32, 42, 49, 0.85);
+  color: #b7c6d0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.fc6-pill-ctrl:hover {
+  border-color: rgba(167, 232, 230, 0.45);
+  color: var(--fc6-mint);
+}
+
+.fc6-pill-danger {
+  color: var(--fc6-coral);
+  border-color: rgba(237, 116, 131, 0.25);
+}
+
+/* ==========================================================================
+   3. OVAL POKER TABLE & CENTER STAGE (#11382)
+   ========================================================================== */
+
+.fc6-arena {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 72px 78px !important;
+  position: relative;
+}
+
+.poker-oval-felt.fc6-oval-table {
+  width: 100% !important;
+  max-width: 780px !important;
+  height: 410px !important;
+  background: radial-gradient(ellipse at 50% 45%, #1d252b 0%, #151c20 75%, #12181c 100%) !important;
+  border: 18px solid #222c33 !important;
+  border-radius: 220px !important;
+  position: relative;
+  box-shadow:
+    0 26px 60px rgba(4, 9, 13, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.05),
+    inset 0 2px 14px rgba(0, 0, 0, 0.65),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.04) !important;
+}
+
+.fc6-center-stage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.fc6-pot-wrapper {
+  margin-bottom: 0 !important;
+}
+
+.fc6-pot-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 500;
+  letter-spacing: 0.8px;
+}
+
+.fc6-pot-label {
+  color: var(--fc6-muted);
+}
+
+.fc6-pot-amount {
+  color: var(--fc6-teal);
+  font-weight: 600;
+  font-size: 0.86rem;
+}
+
+/* ==========================================================================
+   4. CARDS — 4-COLOR MATTE SLATE FACE + LIGHT DIAGONAL BACK (#11382)
+   ========================================================================== */
+
+.fc-card-scene {
+  width: 62px !important;
+  height: 86px !important;
+}
+
+.fc-card-scene.card-medium {
+  width: 46px !important;
+  height: 62px !important;
+}
+
+.fc-card-scene.card-mini {
+  width: 34px !important;
+  height: 48px !important;
+}
+
+.fc-card-face {
+  background: linear-gradient(180deg, #35434e 0%, #26313a 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 5px !important;
+  box-shadow:
+    0 8px 18px rgba(0, 0, 0, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  padding: 5px 6px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fc-card-face .card-gloss {
+  display: none !important;
+}
+
+.fc-card-top-suit {
+  align-self: flex-start;
+  line-height: 1;
+}
+
+.fc-card-rank-wrap {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  flex: 1;
+  padding-bottom: 2px;
+}
+
+.fc-card-rank {
+  font-family: 'Poppins', sans-serif !important;
+  font-weight: 500 !important;
+  font-size: 2rem !important;
+  line-height: 1 !important;
+  text-shadow: none !important;
+}
+
+.card-medium .fc-card-rank {
+  font-size: 1.35rem !important;
+}
+
+.card-mini .fc-card-rank {
+  font-size: 1.05rem !important;
+}
+
+.fc-card-rank.is-ten {
+  font-size: 1.55rem !important;
+  letter-spacing: -1px;
+}
+
+.card-medium .fc-card-rank.is-ten {
+  font-size: 1.1rem !important;
+}
+
+.card-mini .fc-card-rank.is-ten {
+  font-size: 0.88rem !important;
+}
+
+.fc-suit-hearts .fc-card-rank { color: var(--fc6-coral) !important; }
+.fc-suit-clubs .fc-card-rank { color: var(--fc6-blue) !important; }
+.fc-suit-spades .fc-card-rank { color: var(--fc6-teal) !important; }
+.fc-suit-diamonds .fc-card-rank { color: var(--fc6-peach) !important; }
+
+/* Opponent Card Back: crisp light silver with subtle diagonal stripe */
+.fc-card-back {
+  background: repeating-linear-gradient(
+    -45deg,
+    #e6eaee 0px,
+    #e6eaee 3px,
+    #d5dce2 3px,
+    #d5dce2 6px
+  ) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45) !important;
+}
+
+.fc-back-frame,
+.fc-back-pattern,
+.fc-back-medallion {
+  display: none !important;
+}
+
+.community-cards {
+  gap: 8px !important;
+}
+
+.card-slot.empty-slot .card-placeholder {
+  width: 62px !important;
+  height: 86px !important;
+  border-radius: 5px !important;
+  background: rgba(32, 42, 49, 0.45) !important;
+  border: 1px dashed rgba(114, 127, 135, 0.25) !important;
+  color: rgba(114, 127, 135, 0.3) !important;
+}
+
+/* ==========================================================================
+   5. PLAYER SEATS — TRAPEZOID DARK PLATES + SQUARE AVATAR (#11382)
+   ========================================================================== */
+
+.fc6-seat {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 18;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+.fc6-seat.is-me {
+  z-index: 22;
+}
+
+.fc6-seat-cards {
+  display: flex !important;
+  gap: 3px !important;
+  margin-bottom: -14px !important;
+  z-index: 1;
+  position: relative;
+}
+
+.fc6-side-left .fc6-seat-cards {
+  align-self: flex-start;
+  margin-left: 18px;
+}
+
+.fc6-side-right .fc6-seat-cards {
+  align-self: flex-end;
+  margin-right: 18px;
+}
+
+.fc6-plate {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: stretch;
+  min-width: 168px;
+  height: 54px;
+  background: var(--fc6-plate);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.52);
+  overflow: visible;
+}
+
+.fc6-side-left .fc6-plate {
+  flex-direction: row-reverse;
+}
+
+.fc6-seat.active-turn .fc6-plate {
+  border-color: rgba(167, 232, 230, 0.45);
+  box-shadow: 0 0 0 1px rgba(167, 232, 230, 0.2), 0 14px 30px rgba(0, 0, 0, 0.6);
+}
+
+.fc6-seat.is-winner .fc6-plate {
+  border-color: var(--fc6-mint);
+  box-shadow: 0 0 22px rgba(167, 232, 230, 0.4);
+}
+
+.fc6-avatar-square {
+  width: 48px;
+  height: 48px;
+  margin-top: -10px;
+  margin-left: 4px;
+  margin-right: 4px;
+  border-radius: 3px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #e2e6ea 0px,
+    #e2e6ea 3px,
+    #cfd6dc 3px,
+    #cfd6dc 6px
+  );
+  color: #182025;
+  font-weight: 700;
+  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  flex-shrink: 0;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.45);
+}
+
+.fc6-bot-pip {
+  position: absolute;
+  bottom: -4px;
+  right: -4px;
+  background: var(--fc6-slate-2);
+  color: var(--fc6-mint);
+  font-size: 0.56rem;
+  font-weight: 700;
+  padding: 1px 4px;
+  border-radius: 3px;
+  border: 1px solid rgba(167, 232, 230, 0.35);
+}
+
+.fc6-plate-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 108px;
+}
+
+.fc6-plate-top {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 0 10px;
+  background: linear-gradient(180deg, #2d3a43 0%, #243038 100%);
+}
+
+.fc6-side-left .fc6-plate-top {
+  justify-content: flex-start;
+  flex-direction: row-reverse;
+}
+
+.fc6-chip-val {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--fc6-mint);
+  letter-spacing: 0.2px;
+}
+
+.fc6-plate-bottom {
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 10px;
+  background: var(--fc6-plate-dark);
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.fc6-plate-bottom.is-folded {
+  background: linear-gradient(90deg, rgba(237, 116, 131, 0.92) 0%, rgba(237, 116, 131, 0.12) 100%);
+}
+
+.fc6-status-fold {
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: #11181a;
+  letter-spacing: 0.8px;
+}
+
+.fc6-status-allin {
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--fc6-mint);
+  letter-spacing: 0.6px;
+}
+
+.fc6-status-dc {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--fc6-peach);
+}
+
+.fc6-seat-num {
+  font-size: 0.64rem;
+  font-weight: 600;
+  color: var(--fc6-muted);
+}
+
+.fc6-player-name {
+  font-size: 0.64rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #8c9ca6;
+  max-width: 82px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Empty Seat Plate with Mint + Square (#11382) */
+.fc6-empty-plate {
+  display: flex;
+  align-items: center;
+  min-width: 152px;
+  height: 48px;
+  padding: 0;
+  background: rgba(23, 31, 37, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  cursor: pointer;
+  overflow: visible;
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.fc6-empty-plate:hover {
+  border-color: rgba(167, 232, 230, 0.45);
+  transform: translateY(-1px);
+}
+
+.fc6-empty-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  height: 100%;
+  padding: 6px 10px;
+}
+
+.fc6-empty-dash {
+  font-size: 0.78rem;
+  color: var(--fc6-muted);
+}
+
+.fc6-empty-num {
+  font-size: 0.62rem;
+  color: var(--fc6-muted);
+  align-self: flex-end;
+}
+
+.fc6-empty-plus {
+  width: 44px;
+  height: 44px;
+  margin-top: -10px;
+  margin-right: 4px;
+  border-radius: 3px;
+  background: var(--fc6-mint);
+  color: var(--fc6-bg-deep);
+  font-size: 1.4rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 16px rgba(167, 232, 230, 0.25);
+}
+
+/* Active Turn Square Timer Badge (exact match to 15 in #11382) */
+.fc6-turn-badge {
+  position: absolute;
+  left: -46px;
+  bottom: 4px;
+  width: 38px;
+  height: 38px;
+  border-radius: 7px;
+  background: #141c21;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 6;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.5);
+}
+
+.fc6-turn-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.fc6-turn-track {
+  fill: none;
+  stroke: #2c3842;
+  stroke-width: 2.5;
+}
+
+.fc6-turn-progress {
+  fill: none;
+  stroke: var(--fc6-coral);
+  stroke-width: 2.8;
+  stroke-linecap: round;
+  stroke-dasharray: 140;
+  stroke-dashoffset: 35;
+}
+
+.fc6-turn-num {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: #dce6ec;
+  position: relative;
+  z-index: 2;
+}
+
+/* Felt Bet Cluster + D / S / B Markers */
+.fc6-bet-cluster {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  z-index: 12;
+  pointer-events: none;
+}
+
+.fc6-bet-top {
+  top: -54px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.fc6-bet-bottom {
+  bottom: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.fc6-bet-right {
+  right: -96px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.fc6-bet-left {
+  left: -96px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.fc6-bet-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 5px;
+  border-radius: 999px;
+  background: rgba(24, 32, 37, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: #a4b4be;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.fc6-marker {
+  width: 19px;
+  height: 19px;
+  border-radius: 50%;
+  font-size: 0.62rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.fc6-marker-d {
+  background: var(--fc6-amber);
+  color: #182025;
+}
+
+.fc6-marker-s {
+  background: #8c9aa3;
+  color: #182025;
+}
+
+/* ==========================================================================
+   6. BOTTOM HUD — CHAT + BALANCE BOX (LEFT) & ACTION DOCK (RIGHT) (#11382)
+   ========================================================================== */
+
+.fc6-bottom-hud {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0 24px 20px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  pointer-events: none;
+  z-index: 30;
+}
+
+.fc6-bottom-left,
+.fc6-action-dock {
+  pointer-events: auto;
+}
+
+.fc6-bottom-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fc6-chat-trigger {
+  width: 38px;
+  height: 38px;
+  border-radius: 6px;
+  border: none;
+  background: transparent;
+  color: #6b7b85;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.fc6-chat-trigger:hover,
+.fc6-chat-trigger.is-active {
+  color: var(--fc6-mint);
+}
+
+.fc6-chat-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--fc6-peach);
+}
+
+.fc6-balance-group {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 4px;
+}
+
+.fc6-balance-box {
+  height: 38px;
+  padding: 0 14px 0 10px;
+  background: rgba(24, 33, 39, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.fc6-balance-num {
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #c2d0d8;
+}
+
+.fc6-balance-plus {
+  width: 38px;
+  height: 38px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--fc6-slate-2);
+  color: #dce6ec;
+  font-size: 1.2rem;
+  font-weight: 400;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.fc6-balance-plus:hover {
+  background: var(--fc6-slate-4);
+}
+
+/* Action Dock (Bottom-Right) */
+.fc6-action-dock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.fc6-bet-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fc6-slider-column {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 210px;
+}
+
+.fc6-presets-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+}
+
+.fc6-preset-pill {
+  height: 22px;
+  border-radius: 999px;
+  border: none;
+  background: #232d35;
+  color: #8b9ba5;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.64rem;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.fc6-preset-pill:hover {
+  background: var(--fc6-slate-3);
+  color: var(--fc6-mint);
+}
+
+.fc6-range-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--fc6-teal) 0%, #34424d 100%);
+  outline: none;
+  cursor: pointer;
+}
+
+.fc6-range-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.fc6-range-slider::-moz-range-thumb {
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: none;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+
+.fc6-amount-box {
+  min-width: 58px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 3px;
+  background: #1a2329;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  color: #b7c6d0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fc6-buttons-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fc6-btn {
+  min-width: 74px;
+  height: 44px;
+  padding: 0 14px;
+  border-radius: 8px;
+  border: none;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, filter 0.15s ease, opacity 0.15s ease;
+}
+
+.fc6-btn:hover:not(:disabled) {
+  filter: brightness(1.08);
+  transform: translateY(-1px);
+}
+
+.fc6-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.fc6-btn-fold {
+  background: var(--fc6-coral);
+  color: #141c20;
+}
+
+.fc6-btn-slate {
+  background: var(--fc6-slate-2);
+  color: #c7d5de;
+}
+
+.fc6-btn-bet {
+  background: var(--fc6-mint);
+  color: #11181a;
+}
+
+.fc6-btn-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1.15;
+}
+
+.fc6-btn-sub {
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+/* Settings & Chat Drawer Dark Matte Override */
+.fc6-settings-drawer,
+.fc6-chat-drawer {
+  background: linear-gradient(180deg, #253038 0%, #161e23 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 24px 55px rgba(0, 0, 0, 0.65) !important;
+}
+
+.fc6-winner-banner {
+  background: rgba(24, 32, 37, 0.94) !important;
+  border: 1px solid rgba(167, 232, 230, 0.45) !important;
+  border-radius: 8px !important;
+  color: #e6eff5 !important;
+}
+
+/* ==========================================================================
+   7. AUTH PAGES — ALIGNED WITH FIGCRAFT DARK MATTE SYSTEM
+   ========================================================================== */
+
+.auth-page {
+  background: radial-gradient(ellipse at 95% 5%, #3c4b57 0%, #131f25 75%, #0d1418 100%) !important;
+}
+
+.auth-card {
+  background: linear-gradient(180deg, #26323b 0%, #151d22 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 14px !important;
+  box-shadow: 0 30px 70px rgba(4, 9, 13, 0.72) !important;
+}
+
+.auth-card .btn-primary {
+  background: var(--fc6-mint) !important;
+  color: #11181a !important;
+  font-weight: 700 !important;
+  border: none !important;
+  border-radius: 8px !important;
+}
+
+.auth-card .btn-primary:hover:not(:disabled) {
+  filter: brightness(1.06);
+}
+
+.auth-card input {
+  background: #141c21 !important;
+  border: 1px solid rgba(255, 255, 255, 0.09) !important;
+  border-radius: 7px !important;
+  color: #e4edf2 !important;
+}
+
+.auth-card input:focus {
+  border-color: var(--fc6-teal) !important;
+}
+
+/* ==========================================================================
+   8. RESPONSIVE MOBILE (100dvh PORTRAIT ZERO-SCROLL)
+   ========================================================================== */
+
+@media (max-width: 900px) {
+  .fc6-canvas {
+    padding: 0 !important;
+  }
+
+  .fc6-board {
+    max-width: 100% !important;
+    max-height: 100dvh !important;
+    height: 100dvh !important;
+    border-radius: 0 !important;
+    border: none !important;
+  }
+
+  .fc6-arena {
+    padding: 58px 14px 120px !important;
+  }
+
+  .poker-oval-felt.fc6-oval-table {
+    height: 360px !important;
+    border-width: 12px !important;
+  }
+
+  .fc6-plate {
+    min-width: 118px;
+    height: 44px;
+  }
+
+  .fc6-avatar-square {
+    width: 34px;
+    height: 34px;
+    font-size: 0.75rem;
+  }
+
+  .fc6-plate-info {
+    min-width: 78px;
+  }
+
+  .fc6-table-meta {
+    display: none;
+  }
+
+  .fc6-bottom-hud {
+    padding: 0 12px 12px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .fc6-action-dock {
+    align-items: stretch;
+  }
+
+  .fc6-buttons-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+  }
+
+  .fc6-btn {
+    min-width: 0;
+    height: 40px;
+    padding: 0 6px;
+    font-size: 0.68rem;
+  }
+
+  .fc6-slider-column {
+    flex: 1;
+    width: auto;
+  }
+}

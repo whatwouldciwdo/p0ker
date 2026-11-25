@@ -8,8 +8,8 @@ import { getSocket, disconnectSocket } from '../socket/socketClient';
 import {
   BotIcon,
   LogOutIcon,
+  PawIcon,
   PokerChipIcon,
-  SpadeEmblemIcon,
   TableMiniIcon,
   TrashIcon,
   UsersIcon,
@@ -177,7 +177,7 @@ export default function LobbyPage() {
           <header className="fc-lobby-header">
             <div className="fc-lobby-brand">
               <div className="fc-logo-ring">
-                <SpadeEmblemIcon size={20} />
+                <PawIcon size={20} />
               </div>
               <h1>Poker Rooms</h1>
             </div>

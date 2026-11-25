@@ -10,6 +10,7 @@ import './styles/table-v2.css';
 import './styles/table-v3.css';
 import './styles/table-v4.css';
 import './styles/table-v5.css';
+import './styles/table-v6.css';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {

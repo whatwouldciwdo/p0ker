@@ -4,7 +4,7 @@ import PlayerSeat from './PlayerSeat';
 import CommunityCards from './CommunityCards';
 import PotDisplay from './PotDisplay';
 import ActionDock from './ActionDock';
-import DealerBooth from './DealerBooth';
+import Card from './Card';
 import { soundEngine } from '../../utils/soundEngine';
 import {
   BotIcon,
@@ -12,6 +12,7 @@ import {
   ExitDoorIcon,
   HomeIcon,
   MenuBarsIcon,
+  PawIcon,
   PokerChipIcon,
   SoundOffIcon,
   SoundOnIcon,
@@ -43,11 +44,11 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   const [chatInput, setChatInput] = useState('');
   const [showChat, setShowChat] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showHighHand, setShowHighHand] = useState(false);
   const [muted, setMuted] = useState(() => soundEngine.isMuted());
   const [volume, setVolume] = useState(() => Math.round(soundEngine.getVolume() * 100));
-  const [isDealing, setIsDealing] = useState(false);
   const [handEpoch, setHandEpoch] = useState(0);
-  const [turnSeconds, setTurnSeconds] = useState(30);
+  const [turnSeconds, setTurnSeconds] = useState(15);
 
   const prevPhaseRef = useRef<string>(tableState.phase);
   const prevHoleSigRef = useRef<string>('');
@@ -55,7 +56,6 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   const prevPotRef = useRef<number>(tableState.pot);
   const prevMyTurnRef = useRef<boolean>(false);
   const prevWinnersLenRef = useRef<number>(tableState.winners?.length || 0);
-  const dealingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const me = tableState.players.find((p) => p.userId === myUserId);
   const myHoleSig = (me?.holeCards || []).map((c) => `${c.rank}${c.suit}`).join('-');
@@ -66,9 +66,8 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   const isMyTurn = Boolean(me && activePlayer && activePlayer.userId === myUserId);
   const highestBet = Math.max(0, ...tableState.players.map((p) => p.bet));
 
-  // Turn countdown timer for the glowing FigCraft timer ring (bottom-left)
   useEffect(() => {
-    if (!isMyTurn) {
+    if (!activePlayer) {
       setTurnSeconds(0);
       return;
     }
@@ -77,15 +76,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
       setTurnSeconds((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(id);
-  }, [isMyTurn, tableState.currentPlayerSeat, tableState.phase, tableState.pot]);
-
-  const triggerDealingAnimation = (durationMs = 1000) => {
-    setIsDealing(true);
-    if (dealingTimeoutRef.current) clearTimeout(dealingTimeoutRef.current);
-    dealingTimeoutRef.current = setTimeout(() => {
-      setIsDealing(false);
-    }, durationMs);
-  };
+  }, [activePlayer?.userId, tableState.currentPlayerSeat, tableState.phase, tableState.pot]);
 
   useEffect(() => {
     const enteredPreFlop =
@@ -100,7 +91,6 @@ export const PokerTable: React.FC<PokerTableProps> = ({
         tableState.players.filter((p) => p.status !== 'sitting-out').length
       );
       const cardsToSound = Math.min(activeCount * 2, 8);
-      triggerDealingAnimation(cardsToSound * 110 + 400);
       soundEngine.playDealSequence(cardsToSound, 105, false);
     }
     prevPhaseRef.current = tableState.phase;
@@ -109,7 +99,6 @@ export const PokerTable: React.FC<PokerTableProps> = ({
     const commCount = tableState.communityCards.length;
     if (commCount > prevCommCountRef.current) {
       const newlyDealt = commCount - prevCommCountRef.current;
-      triggerDealingAnimation(newlyDealt * 150 + 450);
       soundEngine.playDealSequence(newlyDealt, 135, true);
     }
     prevCommCountRef.current = commCount;
@@ -138,12 +127,6 @@ export const PokerTable: React.FC<PokerTableProps> = ({
     tableState.players,
     isMyTurn,
   ]);
-
-  useEffect(() => {
-    return () => {
-      if (dealingTimeoutRef.current) clearTimeout(dealingTimeoutRef.current);
-    };
-  }, []);
 
   const handleToggleMute = () => {
     soundEngine.unlock();
@@ -178,68 +161,105 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   };
 
   const winnerUserIds = new Set((tableState.winners || []).map((w) => w.userId));
-  const totalSeats = tableState.maxPlayers || 9;
+  const totalSeats = tableState.maxPlayers || 6;
   const seats = Array.from({ length: totalSeats }, (_, i) => i + 1);
   const canAddBot =
     tableState.allowBots !== false &&
-    tableState.players.length < (tableState.maxPlayers || 9);
+    tableState.players.length < totalSeats;
   const hasBots =
     tableState.allowBots !== false && tableState.players.some((p) => p.isBot);
 
   return (
     <div
-      className="fc-table-canvas"
+      className="fc-table-canvas fc6-canvas"
       onPointerDown={() => soundEngine.unlock()}
     >
-      {/* Floating Rounded-Rectangle FigCraft Game Board (matches full table.png) */}
-      <div className="poker-table-wrapper fc-game-board">
-        {/* Top-Left 3-Petal Organic Cluster (Menu, Home, Bot) */}
-        <div className="fc-corner-top-left">
-          <div className="fc-petal-grid">
+      {/* Matte Charcoal FigCraft Desktop HD Board (#11382) */}
+      <div className="poker-table-wrapper fc6-board">
+        {/* Top-Left Minimal Controls + High Hand Badge */}
+        <div className="fc6-top-left">
+          <div className="fc6-nav-icons">
             <button
               type="button"
-              className={`fc-petal-btn fc-petal-menu ${showSettings ? 'is-active' : ''}`}
+              className={`fc6-icon-btn ${showSettings ? 'is-active' : ''}`}
               onClick={() => setShowSettings((v) => !v)}
               title="Settings"
             >
-              <MenuBarsIcon size={18} />
+              <MenuBarsIcon size={20} />
             </button>
 
             <button
               type="button"
-              className="fc-petal-btn fc-petal-home"
+              className="fc6-icon-btn"
               onClick={onLeave}
               title="Kembali ke Lobi"
             >
-              <HomeIcon size={17} />
+              <HomeIcon size={19} />
             </button>
 
-            <button
-              type="button"
-              className="fc-petal-btn fc-petal-bot"
-              onClick={canAddBot ? onAddBot : handleToggleMute}
-              title={canAddBot ? 'Tambah Bot AI' : muted ? 'Aktifkan Suara' : 'Matikan Suara'}
-            >
-              {canAddBot ? (
-                <BotIcon size={17} />
-              ) : muted ? (
-                <SoundOffIcon size={16} />
-              ) : (
-                <SoundOnIcon size={16} />
-              )}
-            </button>
+            <span className="fc6-table-meta" title={tableState.name}>
+              {tableState.name} · ${tableState.smallBlind}/${tableState.bigBlind}
+            </span>
           </div>
-          <span className="fc-petal-caption">
-            {tableState.name}
-          </span>
+
+          <button
+            type="button"
+            className={`fc6-highhand-btn ${showHighHand ? 'is-active' : ''}`}
+            onClick={() => setShowHighHand((v) => !v)}
+          >
+            <span className="fc6-highhand-icon">
+              <PawIcon size={18} />
+            </span>
+            <span className="fc6-highhand-label">High Hand</span>
+          </button>
+
+          {/* High Hand Popover (matches #12364) */}
+          {showHighHand && (
+            <div className="fc6-highhand-popover">
+              <div className="fc6-hh-header">
+                <span>High Hand</span>
+                <button
+                  type="button"
+                  className="fc6-hh-close"
+                  onClick={() => setShowHighHand(false)}
+                >
+                  ✕
+                </button>
+              </div>
+              <div className="fc6-hh-cards">
+                {tableState.communityCards.length > 0 ? (
+                  tableState.communityCards.slice(0, 5).map((c, i) => (
+                    <Card key={i} card={c} size="mini" />
+                  ))
+                ) : (
+                  <div className="fc6-hh-empty">Menunggu kartu board...</div>
+                )}
+              </div>
+              <div className="fc6-hh-footer">
+                <span className="fc6-hh-sub">Phase</span>
+                <span className="fc6-hh-timer">{tableState.phase.toUpperCase()}</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Top-Right Organic Corner Exit Button + Sound Toggle */}
-        <div className="fc-corner-top-right">
+        {/* Top-Right Minimal Controls */}
+        <div className="fc6-top-right">
+          {canAddBot && (
+            <button
+              type="button"
+              className="fc6-pill-ctrl"
+              onClick={onAddBot}
+              title="Tambah Bot AI"
+            >
+              <BotIcon size={14} />
+              <span>+ Bot</span>
+            </button>
+          )}
           {hasBots && (
             <button
               type="button"
-              className="fc-neu-pill-btn fc-bot-rem-btn"
+              className="fc6-pill-ctrl fc6-pill-danger"
               onClick={onRemoveBot}
               title="Keluarkan 1 Bot AI"
             >
@@ -247,31 +267,31 @@ export const PokerTable: React.FC<PokerTableProps> = ({
             </button>
           )}
           {tableState.allowBots === false && (
-            <span className="badge badge-human-only" title="Meja khusus manusia">
+            <span className="fc6-pill-ctrl" title="Meja khusus manusia">
               <UsersIcon size={13} />
             </span>
           )}
           <button
             type="button"
-            className={`fc-neu-btn btn-sound-toggle ${muted ? 'is-muted' : ''}`}
+            className={`fc6-icon-btn ${muted ? 'is-muted' : ''}`}
             onClick={handleToggleMute}
             title={muted ? 'Aktifkan suara' : 'Matikan suara'}
           >
-            {muted ? <SoundOffIcon size={16} /> : <SoundOnIcon size={16} />}
+            {muted ? <SoundOffIcon size={18} /> : <SoundOnIcon size={18} />}
           </button>
           <button
             type="button"
-            className="fc-petal-btn fc-petal-exit"
+            className="fc6-icon-btn"
             onClick={onLeave}
             title="Keluar Meja"
           >
-            <ExitDoorIcon size={19} />
+            <ExitDoorIcon size={20} />
           </button>
         </div>
 
-        {/* Settings Drawer (Exact match for settings.png) */}
+        {/* Settings Drawer */}
         {showSettings && (
-          <aside className="fc-settings-drawer">
+          <aside className="fc-settings-drawer fc6-settings-drawer">
             <div className="fc-settings-header">
               <h3>Settings</h3>
               <button
@@ -290,7 +310,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
               </div>
               <input
                 type="range"
-                className="fc-raise-slider"
+                className="fc6-range-slider"
                 min={0}
                 max={100}
                 value={volume}
@@ -325,8 +345,8 @@ export const PokerTable: React.FC<PokerTableProps> = ({
             {canAddBot && (
               <button
                 type="button"
-                className="fc-join-btn"
-                style={{ width: '100%', marginTop: '4px' }}
+                className="fc6-btn fc6-btn-bet"
+                style={{ width: '100%', height: '38px', marginTop: '6px' }}
                 onClick={onAddBot}
               >
                 + Tambah Bot AI
@@ -336,19 +356,10 @@ export const PokerTable: React.FC<PokerTableProps> = ({
         )}
 
         {/* Main Poker Arena */}
-        <div className="poker-arena fc-arena-stage">
-          {/* Borderless Soft-Beveled Slate-Indigo Oval Table */}
-          <div className="poker-oval-felt fc-oval-table fc-oval-v5">
-            {/* Dedicated Female Casino Dealer (Non-playing) */}
-            <DealerBooth
-              phase={tableState.phase}
-              isDealing={isDealing}
-              handNumber={handEpoch}
-              hasWinners={Boolean(tableState.winners && tableState.winners.length > 0)}
-            />
-
-            {/* Center Stage: Pot & Community Cards */}
-            <div className="table-center-stage">
+        <div className="poker-arena fc6-arena">
+          <div className="poker-oval-felt fc6-oval-table">
+            {/* Center Stage: TOTAL POT + 5 Community Cards */}
+            <div className="table-center-stage fc6-center-stage">
               <PotDisplay
                 pot={tableState.pot}
                 sidePots={tableState.sidePots}
@@ -361,9 +372,9 @@ export const PokerTable: React.FC<PokerTableProps> = ({
               />
 
               {tableState.winners && tableState.winners.length > 0 && (
-                <div className="winner-banner">
+                <div className="winner-banner fc6-winner-banner">
                   <div className="winner-trophy">
-                    <TrophyIcon size={18} />
+                    <TrophyIcon size={17} />
                   </div>
                   <div className="winner-details">
                     {tableState.winners.map((w, idx) => (
@@ -391,46 +402,48 @@ export const PokerTable: React.FC<PokerTableProps> = ({
                 <PlayerSeat
                   key={seatNum}
                   seatNumber={seatNum}
+                  totalSeats={totalSeats}
                   player={player}
                   isActiveTurn={isTurn}
                   isMe={isThisMe}
                   isWinner={isWin}
                   handNumber={handEpoch}
+                  turnSeconds={isTurn ? turnSeconds : 0}
                 />
               );
             })}
           </div>
         </div>
 
-        {/* Bottom HUD: Corner Chat + Chip Balance + Timer Ring (Left) & Action Dock (Right) */}
-        <div className="fc-bottom-hud fc-bottom-hud-v5">
-          <div className="fc-bottom-left-hud">
+        {/* Bottom HUD: Chat + Balance Box (Left) & Action Dock (Right) */}
+        <div className="fc6-bottom-hud">
+          <div className="fc6-bottom-left">
             <button
               type="button"
-              className={`fc-petal-btn fc-petal-chat ${showChat ? 'is-active' : ''}`}
+              className={`fc6-chat-trigger ${showChat ? 'is-active' : ''}`}
               onClick={() => setShowChat((v) => !v)}
               title="Table Chat"
             >
-              <ChatIcon size={17} />
-              {chatMessages.length > 0 && !showChat && <span className="fc-chat-dot" />}
+              <ChatIcon size={20} />
+              {chatMessages.length > 0 && !showChat && <span className="fc6-chat-dot" />}
             </button>
 
             {me && (
-              <div className="fc-my-chips-pill fc-chips-v5">
-                <PokerChipIcon size={19} variant="blue" />
-                <span className="fc-my-chips-val">${me.chips.toLocaleString()}</span>
-                <span className="fc-chips-plus" title={`Blinds $${tableState.smallBlind}/$${tableState.bigBlind}`}>
+              <div className="fc6-balance-group">
+                <div className="fc6-balance-box">
+                  <PokerChipIcon size={20} variant="blue" />
+                  <span className="fc6-balance-num">{me.chips.toLocaleString()}</span>
+                </div>
+                <button
+                  type="button"
+                  className="fc6-balance-plus"
+                  onClick={() => setShowSettings((v) => !v)}
+                  title={`Blinds $${tableState.smallBlind}/$${tableState.bigBlind}`}
+                >
                   +
-                </span>
+                </button>
               </div>
             )}
-
-            {/* Neon Circular Turn Timer (matches full table.png bottom center-left) */}
-            <div className={`fc-turn-orb ${isMyTurn ? 'is-active' : ''}`} title="Waktu giliran">
-              <span className="fc-turn-orb-num">
-                {String(turnSeconds).padStart(2, '0')}
-              </span>
-            </div>
           </div>
 
           {isMyTurn && me && (
@@ -447,7 +460,7 @@ export const PokerTable: React.FC<PokerTableProps> = ({
 
         {/* Floating Chat Drawer */}
         {showChat && (
-          <aside className="chat-drawer fc-chat-drawer">
+          <aside className="chat-drawer fc6-chat-drawer">
             <div className="chat-header">
               <h4>Table Chat</h4>
               <button
