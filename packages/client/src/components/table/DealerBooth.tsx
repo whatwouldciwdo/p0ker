@@ -37,6 +37,8 @@ export const DealerBooth: React.FC<DealerBoothProps> = ({
           src="/dealer-woman.jpg"
           alt="Casino Dealer"
           className="dealer-portrait"
+          width={72}
+          height={72}
           draggable={false}
         />
         <span className="dealer-role-pill">DEALER</span>
