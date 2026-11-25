@@ -52,6 +52,7 @@ export class Table {
   private winners: WinnerInfo[] | null = null;
 
   private turnTimer: ReturnType<typeof setTimeout> | null = null;
+  private destroyed: boolean = false;
   private lastRaiseSize: number = 0;
   private currentBet: number = 0;
 
@@ -964,6 +965,11 @@ export class Table {
     }, 30000);
   }
 
+  public destroy(): void {
+    this.destroyed = true;
+    this.clearTurnTimer();
+  }
+
   private clearTurnTimer(): void {
     if (this.turnTimer) {
       clearTimeout(this.turnTimer);
@@ -972,6 +978,7 @@ export class Table {
   }
 
   private emit(): void {
+    if (this.destroyed) return;
     // Emit a sanitized state; the caller/socket layer will call getStateForPlayer per player
     // Here we emit the full state (the socket handler will re-call getStateForPlayer)
     this.onStateChange(this.getStateForPlayer('__server__'));

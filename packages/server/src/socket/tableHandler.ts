@@ -13,7 +13,7 @@ export async function broadcastToTable(
   tableId: string,
 ): Promise<void> {
   const tableManager = TableManager.getInstance();
-  const table = tableManager.getTable(tableId);
+  const table = tableManager.findTable(tableId);
   if (!table) return;
 
   const room = io.sockets.adapter.rooms.get(tableId);

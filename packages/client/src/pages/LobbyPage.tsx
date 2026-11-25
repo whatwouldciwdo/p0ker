@@ -12,6 +12,7 @@ export default function LobbyPage() {
   const { lobbyTables, setLobbyTables } = useGameStore();
 
   const [loading, setLoading] = useState(true);
+  const [clearingAll, setClearingAll] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showBuyInModal, setShowBuyInModal] = useState(false);
   const [selectedTable, setSelectedTable] = useState<LobbyTable | null>(null);
@@ -96,19 +97,37 @@ export default function LobbyPage() {
     if (!window.confirm('Yakin ingin menghapus meja ini?')) return;
     try {
       await api.delete(`/api/lobby/tables/${tableId}`);
-      fetchTables();
+      setLobbyTables(lobbyTables.filter((t) => t.tableId !== tableId));
+      await fetchTables();
     } catch (err: any) {
       console.error('Delete table error', err);
+      const msg =
+        err?.response?.data?.error ||
+        (err?.response?.status === 404
+          ? 'Endpoint hapus meja tidak ditemukan (pastikan server backend sudah di-rebuild & restart).'
+          : 'Gagal menghapus meja.');
+      window.alert(msg);
     }
   };
 
   const handleClearAllTables = async () => {
+    if (clearingAll) return;
     if (!window.confirm('Hapus SEMUA meja yang ada di lobi?')) return;
     try {
+      setClearingAll(true);
       await api.delete('/api/lobby/tables');
-      fetchTables();
+      setLobbyTables([]);
+      await fetchTables();
     } catch (err: any) {
       console.error('Clear tables error', err);
+      const msg =
+        err?.response?.data?.error ||
+        (err?.response?.status === 404
+          ? 'Endpoint hapus semua meja tidak ditemukan (pastikan server backend sudah di-rebuild & restart).'
+          : 'Gagal menghapus semua meja.');
+      window.alert(msg);
+    } finally {
+      setClearingAll(false);
     }
   };
 
@@ -186,12 +205,14 @@ export default function LobbyPage() {
           <div style={{ display: 'flex', gap: '10px' }}>
             {lobbyTables.length > 0 && (
               <button
+                type="button"
                 className="btn btn-outline btn-sm"
                 onClick={handleClearAllTables}
+                disabled={clearingAll}
                 style={{ borderColor: '#ef4444', color: '#ef4444' }}
                 title="Hapus semua meja yang ada"
               >
-                🗑️ Hapus Semua Meja
+                {clearingAll ? 'Menghapus...' : '🗑️ Hapus Semua Meja'}
               </button>
             )}
             <button

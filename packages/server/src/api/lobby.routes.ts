@@ -2,6 +2,7 @@ import { Router, Request, Response } from 'express';
 import { cookieAuthMiddleware } from '../middleware/auth';
 import { tableManager } from '../engine/TableManager';
 import { broadcastToTable } from '../socket/tableHandler';
+import { broadcastLobbyUpdate } from '../socket/lobbyHandler';
 
 const router = Router();
 
@@ -58,6 +59,11 @@ router.post('/tables', (req: Request, res: Response): void => {
       () => {} // onStateChange placeholder; socket layer handles broadcasts
     );
 
+    const io = tableManager.getIO();
+    if (io) {
+      broadcastLobbyUpdate(io);
+    }
+
     res.status(201).json({ tableId: table.id });
   } catch (err) {
     console.error('Create table error:', err);
@@ -69,6 +75,10 @@ router.post('/tables', (req: Request, res: Response): void => {
 router.delete('/tables', (req: Request, res: Response): void => {
   try {
     tableManager.clearAllTables();
+    const io = tableManager.getIO();
+    if (io) {
+      broadcastLobbyUpdate(io);
+    }
     res.json({ success: true, message: 'Semua meja berhasil dihapus' });
   } catch (err: any) {
     console.error('Clear tables error:', err);
@@ -84,6 +94,10 @@ router.delete('/tables/:tableId', (req: Request, res: Response): void => {
     if (!deleted) {
       res.status(404).json({ error: 'Meja tidak ditemukan' });
       return;
+    }
+    const io = tableManager.getIO();
+    if (io) {
+      broadcastLobbyUpdate(io);
     }
     res.json({ success: true, message: 'Meja berhasil dihapus' });
   } catch (err: any) {

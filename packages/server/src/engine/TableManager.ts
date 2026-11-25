@@ -35,7 +35,7 @@ export class TableManager {
   ): Table {
     const table = new Table(tableId, opts, (state) => {
       if (onStateChange) onStateChange(state);
-      if (this.io) {
+      if (this.io && this.tables.has(tableId)) {
         broadcastToTable(this.io, tableId);
       }
     });
@@ -68,9 +68,14 @@ export class TableManager {
     return table;
   }
 
+  public findTable(tableId: string): Table | undefined {
+    return this.tables.get(tableId);
+  }
+
   public deleteTable(tableId: string): boolean {
     const table = this.tables.get(tableId);
     if (!table) return false;
+    table.destroy();
     if (this.io) {
       this.io.to(tableId).emit('toast', 'Meja ini telah ditutup.', 'info');
     }
@@ -78,8 +83,9 @@ export class TableManager {
   }
 
   public clearAllTables(): void {
-    if (this.io) {
-      for (const tableId of this.tables.keys()) {
+    for (const [tableId, table] of this.tables.entries()) {
+      table.destroy();
+      if (this.io) {
         this.io.to(tableId).emit('toast', 'Meja ini telah ditutup.', 'info');
       }
     }
