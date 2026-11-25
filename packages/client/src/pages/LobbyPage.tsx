@@ -4,7 +4,7 @@ import { LobbyTable, CreateTableOptions } from '@p0ker/shared';
 import { api } from '../api/axios';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
-import { getSocket } from '../socket/socketClient';
+import { getSocket, disconnectSocket } from '../socket/socketClient';
 
 export default function LobbyPage() {
   const navigate = useNavigate();
@@ -76,6 +76,7 @@ export default function LobbyPage() {
     } catch {
       // ignore
     }
+    disconnectSocket();
     clearUser();
     navigate('/login');
   };

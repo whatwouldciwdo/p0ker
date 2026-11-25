@@ -2,6 +2,7 @@ import { useState, FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { api } from '../api/axios';
 import { useAuthStore } from '../store/authStore';
+import { disconnectSocket } from '../socket/socketClient';
 
 export default function RegisterPage() {
   const navigate = useNavigate();
@@ -24,6 +25,7 @@ export default function RegisterPage() {
         email: autoEmail,
       });
       const { id, username: uname, chips } = res.data;
+      disconnectSocket();
       setUser({ id, username: uname, chips });
       navigate('/lobby');
     } catch (err: unknown) {

@@ -13,8 +13,10 @@ export function getSocket(): TypedSocket {
       reconnection: true,
       reconnectionAttempts: 10,
       reconnectionDelay: 1000,
-      transports: ['websocket', 'polling'],
+      transports: ['polling', 'websocket'],
     });
+  } else if (!socket.connected && !socket.active) {
+    socket.connect();
   }
   return socket;
 }

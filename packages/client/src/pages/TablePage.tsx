@@ -3,7 +3,7 @@ import { useParams, useNavigate, useSearchParams } from 'react-router-dom';
 import { TableState, PlayerAction } from '@p0ker/shared';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
-import { getSocket } from '../socket/socketClient';
+import { getSocket, disconnectSocket } from '../socket/socketClient';
 import { api } from '../api/axios';
 import PokerTable from '../components/table/PokerTable';
 
@@ -25,6 +25,7 @@ export default function TablePage() {
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (!tableId || !user) {
@@ -34,8 +35,13 @@ export default function TablePage() {
 
     const socket = getSocket();
 
+    const emitJoin = () => {
+      socket.emit('table:join', { tableId, buyIn });
+    };
+
     // Listen for game state updates
     const handleGameState = (state: TableState) => {
+      setErrorMessage(null);
       setTableState(state);
     };
 
@@ -44,9 +50,16 @@ export default function TablePage() {
     };
 
     const handleError = (err: any) => {
-      const msg = typeof err === 'object' ? err.message : err;
+      const msg = typeof err === 'object' ? err.message : String(err);
       setErrorMessage(msg);
-      setTimeout(() => setErrorMessage(null), 4000);
+      if (useGameStore.getState().tableState) {
+        setTimeout(() => setErrorMessage(null), 4000);
+      }
+    };
+
+    const handleConnectError = (err: Error) => {
+      console.error('Socket connect_error:', err);
+      setErrorMessage(`Koneksi socket gagal: ${err.message}`);
     };
 
     const handleToast = (msg: string) => {
@@ -54,23 +67,31 @@ export default function TablePage() {
       setTimeout(() => setNotification(null), 3000);
     };
 
+    socket.on('connect', emitJoin);
+    socket.on('connect_error', handleConnectError);
     socket.on('table:state', handleGameState);
     socket.on('game:state', handleGameState);
     socket.on('chat:message', handleChat);
     socket.on('error', handleError);
     socket.on('toast', handleToast);
 
-    // Join table
-    socket.emit('table:join', { tableId, buyIn });
+    // Join table immediately if already connected; otherwise connect (which triggers 'connect' -> emitJoin)
+    if (socket.connected) {
+      emitJoin();
+    } else {
+      socket.connect();
+    }
 
     return () => {
+      socket.off('connect', emitJoin);
+      socket.off('connect_error', handleConnectError);
       socket.off('table:state', handleGameState);
       socket.off('game:state', handleGameState);
       socket.off('chat:message', handleChat);
       socket.off('error', handleError);
       socket.off('toast', handleToast);
     };
-  }, [tableId, user]);
+  }, [tableId, user, buyIn, retryCount]);
 
   const handleAction = (action: PlayerAction, amount?: number) => {
     const socket = getSocket();
@@ -132,6 +153,34 @@ export default function TablePage() {
           <div className="loading-spinner" />
           <h3>Menghubungkan ke meja...</h3>
           <p>Table ID: {tableId}</p>
+          {errorMessage && (
+            <div className="auth-error" style={{ marginTop: '12px' }}>
+              ⚠️ {errorMessage}
+            </div>
+          )}
+          <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '16px' }}>
+            <button
+              type="button"
+              className="btn btn-primary btn-sm"
+              onClick={() => {
+                setErrorMessage(null);
+                disconnectSocket();
+                setRetryCount((c) => c + 1);
+              }}
+            >
+              Coba Lagi
+            </button>
+            <button
+              type="button"
+              className="btn btn-outline btn-sm"
+              onClick={() => {
+                clearGame();
+                navigate('/lobby');
+              }}
+            >
+              Kembali ke Lobi
+            </button>
+          </div>
         </div>
       </div>
     );

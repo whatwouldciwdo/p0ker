@@ -54,9 +54,12 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
 
         // If player is already at the table (reconnect / page refresh)
         if (table.hasPlayer(userId)) {
-          socket.join(tableId);
+          await socket.join(tableId);
           socket.data.tableId = tableId;
           socket.emit('toast', `Kembali ke meja "${table.name}"`, 'success');
+          const reconnectState = table.getStateForPlayer(userId);
+          socket.emit('game:state', reconnectState);
+          socket.emit('table:state', reconnectState);
           await broadcastToTable(io, tableId);
           if (table.getPhase() === 'waiting' && table.activePlayerCount() >= 2 && table.hasHumanPlayer()) {
             setTimeout(() => table.startRound(), 1000);
@@ -97,11 +100,14 @@ export function registerTableHandlers(io: Server, socket: Socket): void {
           return;
         }
 
-        socket.join(tableId);
+        await socket.join(tableId);
         // Store the tableId so we can reference it on disconnect / leave
         socket.data.tableId = tableId;
 
         socket.emit('toast', `Joined table "${table.name}"`, 'success');
+        const initialState = table.getStateForPlayer(userId);
+        socket.emit('game:state', initialState);
+        socket.emit('table:state', initialState);
         await broadcastToTable(io, tableId);
       } catch (err) {
         console.error('table:join error', err);
