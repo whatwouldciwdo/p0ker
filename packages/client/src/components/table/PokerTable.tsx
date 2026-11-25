@@ -6,6 +6,16 @@ import PotDisplay from './PotDisplay';
 import ActionDock from './ActionDock';
 import DealerBooth from './DealerBooth';
 import { soundEngine } from '../../utils/soundEngine';
+import {
+  BotIcon,
+  ChatIcon,
+  LogOutIcon,
+  SoundOffIcon,
+  SoundOnIcon,
+  SpadeEmblemIcon,
+  TrophyIcon,
+  UsersIcon,
+} from '../icons/CasinoIcons';
 
 interface PokerTableProps {
   tableState: TableState;
@@ -162,7 +172,10 @@ export const PokerTable: React.FC<PokerTableProps> = ({
       {/* Top Header Bar */}
       <header className="table-top-bar">
         <div className="table-meta">
-          <span className="room-title">♠ {tableState.name}</span>
+          <span className="room-title">
+            <SpadeEmblemIcon size={17} />
+            <span>{tableState.name}</span>
+          </span>
           <span className="blinds-badge">
             Blinds: ${tableState.smallBlind} / ${tableState.bigBlind}
           </span>
@@ -180,7 +193,8 @@ export const PokerTable: React.FC<PokerTableProps> = ({
                 onClick={onAddBot}
                 title="Tambah Bot AI ke meja"
               >
-                🤖 + Bot
+                <BotIcon size={15} />
+                <span>+ Bot</span>
               </button>
             )}
 
@@ -197,32 +211,35 @@ export const PokerTable: React.FC<PokerTableProps> = ({
 
           {tableState.allowBots === false && (
             <span className="badge badge-human-only" title="Meja murni pemain manusia">
-              👥 Khusus Manusia
+              <UsersIcon size={13} />
+              <span>Khusus Manusia</span>
             </span>
           )}
 
           <button
             type="button"
-            className={`btn btn-secondary btn-sound-toggle ${muted ? 'is-muted' : ''}`}
+            className={`btn btn-secondary btn-icon-only btn-sound-toggle ${muted ? 'is-muted' : ''}`}
             onClick={handleToggleMute}
             title={muted ? 'Aktifkan suara kartu' : 'Matikan suara kartu'}
           >
-            {muted ? '🔇' : '🔊'}
+            {muted ? <SoundOffIcon size={16} /> : <SoundOnIcon size={16} />}
           </button>
 
           <button
             type="button"
-            className="btn btn-secondary btn-chat-toggle"
+            className="btn btn-secondary btn-icon-only btn-chat-toggle"
             onClick={() => setShowChat(!showChat)}
+            title="Buka Chat Meja"
           >
-            💬
+            <ChatIcon size={16} />
           </button>
           <button
             type="button"
             className="btn btn-danger btn-leave"
             onClick={onLeave}
           >
-            Keluar
+            <LogOutIcon size={14} />
+            <span className="leave-label">Keluar</span>
           </button>
         </div>
       </header>
@@ -258,7 +275,9 @@ export const PokerTable: React.FC<PokerTableProps> = ({
             {/* Winner Announcement Banner */}
             {tableState.winners && tableState.winners.length > 0 && (
               <div className="winner-banner">
-                <div className="winner-trophy">🏆</div>
+                <div className="winner-trophy">
+                  <TrophyIcon size={18} />
+                </div>
                 <div className="winner-details">
                   {tableState.winners.map((w, idx) => (
                     <div key={idx} className="winner-line">

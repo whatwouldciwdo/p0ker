@@ -1,6 +1,7 @@
 import React from 'react';
 import { PlayerState } from '@p0ker/shared';
 import Card from './Card';
+import { PokerChipIcon, SeatPlusIcon } from '../icons/CasinoIcons';
 
 interface PlayerSeatProps {
   player?: PlayerState | null;
@@ -39,14 +40,14 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
   if (!player) {
     return (
       <div
-        className="seat-container empty-seat-container"
+        className={`seat-container empty-seat-container seat-pos-${seatNumber}`}
         style={{ left: coord.left, top: coord.top }}
       >
         <button
           className="btn-sit-here"
           onClick={() => onSit && onSit(seatNumber)}
         >
-          <span className="seat-icon">🪑</span>
+          <SeatPlusIcon size={16} className="seat-icon" />
           <span className="seat-label">Seat {seatNumber}</span>
         </button>
       </div>
@@ -63,7 +64,7 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
 
   return (
     <div
-      className={`seat-container player-seat ${isActiveTurn ? 'active-turn' : ''} ${
+      className={`seat-container player-seat seat-pos-${seatNumber} ${isActiveTurn ? 'active-turn' : ''} ${
         isFolded ? 'folded' : ''
       } ${isMe ? 'is-me' : ''} ${isWinner ? 'is-winner' : ''}`}
       style={{ left: coord.left, top: coord.top }}
@@ -159,7 +160,7 @@ export const PlayerSeat: React.FC<PlayerSeatProps> = ({
       {/* Bet Chip in front of seat */}
       {player.bet > 0 && (
         <div className="seat-bet-chip" key={`bet-${player.bet}`}>
-          <span className="chip-icon">🪙</span>
+          <PokerChipIcon size={13} className="chip-icon" />
           <span className="chip-amt">${player.bet.toLocaleString()}</span>
         </div>
       )}

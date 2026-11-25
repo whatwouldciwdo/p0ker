@@ -24,7 +24,7 @@ export const DealerBooth: React.FC<DealerBoothProps> = ({
   hasWinners,
 }) => {
   const statusText = hasWinners
-    ? 'Selamat pemenang! 🏆'
+    ? 'Selamat pemenang!'
     : isDealing
     ? 'Membagikan kartu...'
     : PHASE_LINES[phase] || 'Siap bermain';

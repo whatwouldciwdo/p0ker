@@ -6,6 +6,7 @@ import { useGameStore } from '../store/gameStore';
 import { getSocket, disconnectSocket } from '../socket/socketClient';
 import { api } from '../api/axios';
 import PokerTable from '../components/table/PokerTable';
+import { AlertIcon } from '../components/icons/CasinoIcons';
 
 interface ChatMessage {
   username: string;
@@ -154,8 +155,9 @@ export default function TablePage() {
           <h3>Menghubungkan ke meja...</h3>
           <p>Table ID: {tableId}</p>
           {errorMessage && (
-            <div className="auth-error" style={{ marginTop: '12px' }}>
-              ⚠️ {errorMessage}
+            <div className="auth-error" style={{ marginTop: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <AlertIcon size={15} />
+              <span>{errorMessage}</span>
             </div>
           )}
           <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', marginTop: '16px' }}>
@@ -190,7 +192,8 @@ export default function TablePage() {
     <div className="table-page-container">
       {errorMessage && (
         <div className="toast-notification toast-error">
-          <span>⚠️ {errorMessage}</span>
+          <AlertIcon size={15} />
+          <span>{errorMessage}</span>
         </div>
       )}
 

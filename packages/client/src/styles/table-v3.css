@@ -1,0 +1,299 @@
+/* ==========================================================================
+   TABLE UI v3 — PREMIUM SVG ICONS + FULL-SCREEN 100dvh MOBILE PORTRAIT
+   ========================================================================== */
+
+.casino-icon {
+  display: inline-block;
+  vertical-align: middle;
+  flex-shrink: 0;
+}
+
+.room-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.brand-suit {
+  display: inline-flex;
+  align-items: center;
+  color: var(--gold);
+}
+
+.btn-add-bot,
+.btn-leave,
+.badge-human-only,
+.mode-badge,
+.btn-mode-tab,
+.toast-notification {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.btn-icon-only {
+  width: 34px;
+  height: 34px;
+  padding: 0 !important;
+  border-radius: 8px;
+}
+
+.winner-trophy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #451a03;
+}
+
+/* Full-screen lock so table page NEVER scrolls */
+.table-page-container {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100dvh !important;
+  max-height: 100dvh !important;
+  overflow: hidden !important;
+  touch-action: manipulation;
+}
+
+.poker-table-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+}
+
+.table-top-bar {
+  flex-shrink: 0;
+}
+
+.poker-arena {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow: hidden;
+}
+
+.action-dock-container {
+  flex-shrink: 0;
+  padding-bottom: calc(0.6rem + env(safe-area-inset-bottom, 0px));
+}
+
+/* ==========================================================================
+   MOBILE PORTRAIT — FULL 1-PAGE VERTICAL OVAL TABLE (ZERO SCROLL)
+   ========================================================================== */
+@media (max-width: 768px) and (orientation: portrait) {
+  .table-top-bar {
+    padding: 6px 10px;
+    gap: 6px;
+  }
+
+  .table-meta {
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .room-title {
+    font-size: 0.85rem;
+    max-width: 110px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .table-top-actions {
+    gap: 5px;
+  }
+
+  .table-top-actions .btn-icon-only {
+    width: 30px;
+    height: 30px;
+  }
+
+  .table-top-actions .btn-add-bot,
+  .table-top-actions .btn-remove-bot,
+  .table-top-actions .btn-leave {
+    padding: 5px 8px;
+    font-size: 0.72rem;
+    height: 30px;
+  }
+
+  .table-top-actions .leave-label {
+    display: none;
+  }
+
+  .poker-arena {
+    padding: 26px 18px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Tall vertical casino oval fits phone portrait 100% in 1 screen */
+  .poker-oval-felt {
+    width: calc(100vw - 56px) !important;
+    max-width: 330px !important;
+    height: 100% !important;
+    max-height: 100% !important;
+    min-height: 290px;
+    border-width: 9px !important;
+    border-radius: 140px !important;
+  }
+
+  .table-rail-inner {
+    inset: 6px !important;
+    border-radius: 132px !important;
+  }
+
+  /* Dealer Booth at top of vertical oval */
+  .dealer-booth {
+    top: -16px !important;
+  }
+  .dealer-avatar-frame {
+    width: 48px !important;
+    height: 48px !important;
+  }
+  .dealer-portrait {
+    max-width: 42px !important;
+    max-height: 42px !important;
+  }
+  .dealer-role-pill {
+    font-size: 0.48rem;
+    padding: 1px 6px;
+    bottom: -5px;
+  }
+  .dealer-deck-shoe {
+    display: none !important;
+  }
+  .dealer-speech {
+    margin-top: 6px !important;
+    font-size: 0.56rem !important;
+    padding: 2px 7px !important;
+  }
+
+  /* Center Pot & Community Cards inside vertical oval */
+  .table-center-stage {
+    top: 48% !important;
+    gap: 8px !important;
+    width: 92%;
+  }
+
+  .pot-pill {
+    padding: 3px 10px !important;
+    font-size: 0.78rem !important;
+    gap: 5px;
+  }
+
+  .community-cards {
+    gap: 4px !important;
+  }
+
+  .card-slot,
+  .card-slot .poker-card-scene {
+    width: 38px !important;
+    height: 54px !important;
+  }
+  .card-slot .card-rank { font-size: 0.65rem !important; }
+  .card-slot .card-suit { font-size: 0.58rem !important; }
+  .card-slot .card-center { font-size: 0.95rem !important; }
+
+  .winner-banner {
+    padding: 5px 12px;
+    font-size: 0.72rem;
+    gap: 6px;
+  }
+
+  /* Vertical Oval Seat Coordinates (9 seats cleanly distributed, zero overlap) */
+  .seat-pos-1 { left: 50% !important; top: 93% !important; }
+  .seat-pos-2 { left: 8% !important;  top: 79% !important; }
+  .seat-pos-3 { left: 0% !important;  top: 56% !important; }
+  .seat-pos-4 { left: 4% !important;  top: 31% !important; }
+  .seat-pos-5 { left: 19% !important; top: 12% !important; }
+  .seat-pos-6 { left: 81% !important; top: 12% !important; }
+  .seat-pos-7 { left: 96% !important; top: 31% !important; }
+  .seat-pos-8 { left: 100% !important; top: 56% !important; }
+  .seat-pos-9 { left: 92% !important; top: 79% !important; }
+
+  /* Compact Seats on Portrait */
+  .player-seat {
+    width: 60px !important;
+  }
+  .avatar-wrapper {
+    width: 32px !important;
+    height: 32px !important;
+    margin-bottom: 2px !important;
+  }
+  .timer-svg {
+    inset: -4px !important;
+    width: 40px !important;
+    height: 40px !important;
+  }
+  .player-avatar {
+    font-size: 0.65rem !important;
+  }
+  .player-card-info {
+    padding: 2px 4px !important;
+    border-radius: 6px !important;
+  }
+  .player-name { font-size: 0.58rem !important; }
+  .player-chips { font-size: 0.58rem !important; }
+
+  .poker-card-scene.card-medium {
+    width: 36px !important;
+    height: 52px !important;
+  }
+  .poker-card-scene.card-mini {
+    width: 24px !important;
+    height: 34px !important;
+  }
+  .player-cards {
+    margin-bottom: -10px !important;
+  }
+  .player-cards.my-hole-cards {
+    margin-bottom: -8px !important;
+  }
+  .btn-sit-here {
+    padding: 4px 6px !important;
+    border-radius: 8px !important;
+  }
+  .btn-sit-here .seat-label {
+    font-size: 0.55rem !important;
+  }
+
+  /* Compact Action Dock pinned at bottom */
+  .action-dock-container {
+    padding: 4px 8px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .action-dock {
+    padding: 8px 10px !important;
+    gap: 6px !important;
+    border-radius: 12px !important;
+  }
+  .raise-panel {
+    gap: 5px !important;
+  }
+  .btn-preset {
+    padding: 4px 2px !important;
+    font-size: 0.68rem !important;
+  }
+  .btn-action {
+    padding: 9px 4px !important;
+    font-size: 0.76rem !important;
+  }
+}
+
+/* Very small portrait screens (e.g. iPhone SE / 360x640) */
+@media (max-width: 380px) and (orientation: portrait) {
+  .card-slot,
+  .card-slot .poker-card-scene {
+    width: 32px !important;
+    height: 46px !important;
+  }
+  .poker-card-scene.card-medium {
+    width: 30px !important;
+    height: 44px !important;
+  }
+}

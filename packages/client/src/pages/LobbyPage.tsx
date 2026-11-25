@@ -5,6 +5,14 @@ import { api } from '../api/axios';
 import { useAuthStore } from '../store/authStore';
 import { useGameStore } from '../store/gameStore';
 import { getSocket, disconnectSocket } from '../socket/socketClient';
+import {
+  BotIcon,
+  LogOutIcon,
+  PokerChipIcon,
+  SpadeEmblemIcon,
+  TrashIcon,
+  UsersIcon,
+} from '../components/icons/CasinoIcons';
 
 export default function LobbyPage() {
   const navigate = useNavigate();
@@ -174,13 +182,15 @@ export default function LobbyPage() {
       {/* Top Navbar */}
       <nav className="lobby-navbar">
         <div className="navbar-brand">
-          <span className="brand-suit">♠</span>
+          <span className="brand-suit">
+            <SpadeEmblemIcon size={22} />
+          </span>
           <h1>Texas Hold'em Web</h1>
         </div>
 
         <div className="navbar-user">
           <div className="user-chips-pill">
-            <span className="chip-symbol">🪙</span>
+            <PokerChipIcon size={18} className="chip-symbol" />
             <span className="chip-value">${(user?.chips ?? 0).toLocaleString()}</span>
           </div>
 
@@ -189,8 +199,9 @@ export default function LobbyPage() {
             <span className="user-name">{user?.username}</span>
           </div>
 
-          <button className="btn btn-outline btn-sm" onClick={handleLogout}>
-            Keluar
+          <button className="btn btn-outline btn-sm" onClick={handleLogout} style={{ gap: '6px' }}>
+            <LogOutIcon size={14} />
+            <span>Keluar</span>
           </button>
         </div>
       </nav>
@@ -210,10 +221,11 @@ export default function LobbyPage() {
                 className="btn btn-outline btn-sm"
                 onClick={handleClearAllTables}
                 disabled={clearingAll}
-                style={{ borderColor: '#ef4444', color: '#ef4444' }}
+                style={{ borderColor: '#ef4444', color: '#ef4444', gap: '6px' }}
                 title="Hapus semua meja yang ada"
               >
-                {clearingAll ? 'Menghapus...' : '🗑️ Hapus Semua Meja'}
+                <TrashIcon size={14} />
+                <span>{clearingAll ? 'Menghapus...' : 'Hapus Semua Meja'}</span>
               </button>
             )}
             <button
@@ -245,7 +257,17 @@ export default function LobbyPage() {
                     <div className="table-title-group">
                       <span className="table-name">{table.name}</span>
                       <span className={`mode-badge ${table.allowBots !== false ? 'mode-bot' : 'mode-human'}`}>
-                        {table.allowBots !== false ? '🤖 Bot AI' : '👥 Khusus Manusia'}
+                        {table.allowBots !== false ? (
+                          <>
+                            <BotIcon size={12} />
+                            <span>Bot AI</span>
+                          </>
+                        ) : (
+                          <>
+                            <UsersIcon size={12} />
+                            <span>Khusus Manusia</span>
+                          </>
+                        )}
                       </span>
                     </div>
                     <span className={`status-pill ${table.phase === 'waiting' ? 'status-waiting' : 'status-live'}`}>
@@ -284,7 +306,7 @@ export default function LobbyPage() {
                       title="Hapus Meja Ini"
                       onClick={(e) => handleDeleteTable(table.tableId, e)}
                     >
-                      🗑️
+                      <TrashIcon size={15} />
                     </button>
                   </div>
                 </div>
@@ -383,14 +405,16 @@ export default function LobbyPage() {
                     className={`btn-mode-tab ${allowBots ? 'active' : ''}`}
                     onClick={() => setAllowBots(true)}
                   >
-                    🤖 Izinkan Bot AI
+                    <BotIcon size={15} />
+                    <span>Izinkan Bot AI</span>
                   </button>
                   <button
                     type="button"
                     className={`btn-mode-tab ${!allowBots ? 'active' : ''}`}
                     onClick={() => setAllowBots(false)}
                   >
-                    👥 Khusus Manusia
+                    <UsersIcon size={15} />
+                    <span>Khusus Manusia</span>
                   </button>
                 </div>
               </div>

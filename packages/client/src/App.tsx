@@ -7,6 +7,7 @@ import LobbyPage from './pages/LobbyPage';
 import TablePage from './pages/TablePage';
 import './styles/poker.css';
 import './styles/table-v2.css';
+import './styles/table-v3.css';
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
