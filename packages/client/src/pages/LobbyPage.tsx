@@ -10,6 +10,7 @@ import {
   LogOutIcon,
   PokerChipIcon,
   SpadeEmblemIcon,
+  TableMiniIcon,
   TrashIcon,
   UsersIcon,
 } from '../components/icons/CasinoIcons';
@@ -25,6 +26,7 @@ export default function LobbyPage() {
   const [showBuyInModal, setShowBuyInModal] = useState(false);
   const [selectedTable, setSelectedTable] = useState<LobbyTable | null>(null);
   const [buyInAmount, setBuyInAmount] = useState<number>(200);
+  const [sideTab, setSideTab] = useState<'rooms' | 'info'>('rooms');
 
   // Create table form state
   const [tableName, setTableName] = useState('');
@@ -36,7 +38,6 @@ export default function LobbyPage() {
   const [initialBots, setInitialBots] = useState(1);
   const [createError, setCreateError] = useState('');
 
-  // Fetch tables and current user
   useEffect(() => {
     fetchTables();
     fetchMe();
@@ -60,7 +61,6 @@ export default function LobbyPage() {
         setUser(res.data);
       }
     } catch {
-      // not logged in
       clearUser();
       navigate('/login');
     }
@@ -110,11 +110,7 @@ export default function LobbyPage() {
       await fetchTables();
     } catch (err: any) {
       console.error('Delete table error', err);
-      const msg =
-        err?.response?.data?.error ||
-        (err?.response?.status === 404
-          ? 'Endpoint hapus meja tidak ditemukan (pastikan server backend sudah di-rebuild & restart).'
-          : 'Gagal menghapus meja.');
+      const msg = err?.response?.data?.error || 'Gagal menghapus meja.';
       window.alert(msg);
     }
   };
@@ -129,11 +125,7 @@ export default function LobbyPage() {
       await fetchTables();
     } catch (err: any) {
       console.error('Clear tables error', err);
-      const msg =
-        err?.response?.data?.error ||
-        (err?.response?.status === 404
-          ? 'Endpoint hapus semua meja tidak ditemukan (pastikan server backend sudah di-rebuild & restart).'
-          : 'Gagal menghapus semua meja.');
+      const msg = err?.response?.data?.error || 'Gagal menghapus semua meja.';
       window.alert(msg);
     } finally {
       setClearingAll(false);
@@ -167,154 +159,222 @@ export default function LobbyPage() {
       const res = await api.post('/api/lobby/tables', opts);
       const tableId = res.data.tableId;
       setShowCreateModal(false);
-
-      // Refresh table list
       fetchTables();
-      // Join newly created table
       navigate(`/table/${tableId}?buyIn=${minBuyIn}`);
     } catch (err: any) {
       setCreateError(err.response?.data?.error || 'Gagal membuat meja.');
     }
   };
 
+  const totalOnlinePlayers = lobbyTables.reduce((sum, t) => sum + t.playerCount, 0);
+
   return (
-    <div className="lobby-page">
-      {/* Top Navbar */}
-      <nav className="lobby-navbar">
-        <div className="navbar-brand">
-          <span className="brand-suit">
-            <SpadeEmblemIcon size={22} />
-          </span>
-          <h1>Texas Hold'em Web</h1>
-        </div>
+    <div className="fc-lobby-viewport">
+      {/* Floating FigCraft Split Board (matches poker rooms+signup signin@2x.png) */}
+      <div className="fc-lobby-board">
+        {/* Left Main Panel: Poker Rooms Table */}
+        <section className="fc-lobby-main">
+          <header className="fc-lobby-header">
+            <div className="fc-lobby-brand">
+              <div className="fc-logo-ring">
+                <SpadeEmblemIcon size={20} />
+              </div>
+              <h1>Poker Rooms</h1>
+            </div>
 
-        <div className="navbar-user">
-          <div className="user-chips-pill">
-            <PokerChipIcon size={18} className="chip-symbol" />
-            <span className="chip-value">${(user?.chips ?? 0).toLocaleString()}</span>
-          </div>
+            <div className="fc-lobby-top-controls">
+              <div className="fc-balance-pill">
+                <PokerChipIcon size={16} variant="blue" />
+                <span className="fc-balance-amt">${(user?.chips ?? 0).toLocaleString()}</span>
+                <span className="fc-balance-user">{user?.username}</span>
+              </div>
 
-          <div className="user-profile">
-            <span className="user-avatar">{user?.username?.slice(0, 2).toUpperCase() || 'U'}</span>
-            <span className="user-name">{user?.username}</span>
-          </div>
-
-          <button className="btn btn-outline btn-sm" onClick={handleLogout} style={{ gap: '6px' }}>
-            <LogOutIcon size={14} />
-            <span>Keluar</span>
-          </button>
-        </div>
-      </nav>
-
-      {/* Main Container */}
-      <main className="lobby-content">
-        <div className="lobby-header-actions">
-          <div>
-            <h2>Daftar Meja Poker</h2>
-            <p className="subtitle">Pilih meja yang tersedia atau buat meja dengan aturan Anda sendiri.</p>
-          </div>
-
-          <div style={{ display: 'flex', gap: '10px' }}>
-            {lobbyTables.length > 0 && (
               <button
                 type="button"
-                className="btn btn-outline btn-sm"
-                onClick={handleClearAllTables}
-                disabled={clearingAll}
-                style={{ borderColor: '#ef4444', color: '#ef4444', gap: '6px' }}
-                title="Hapus semua meja yang ada"
+                className="fc-soft-btn fc-soft-btn-cyan"
+                onClick={() => setShowCreateModal(true)}
               >
-                <TrashIcon size={14} />
-                <span>{clearingAll ? 'Menghapus...' : 'Hapus Semua Meja'}</span>
+                + Buat Meja
               </button>
-            )}
-            <button
-              className="btn btn-primary btn-create-table"
-              onClick={() => setShowCreateModal(true)}
-            >
-              + Buat Meja Baru
-            </button>
-          </div>
-        </div>
 
-        {/* Tables Grid */}
-        {loading ? (
-          <div className="lobby-loading">Memuat daftar meja...</div>
-        ) : lobbyTables.length === 0 ? (
-          <div className="lobby-empty">
-            <p>Belum ada meja aktif saat ini.</p>
-            <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-              Buat Meja Pertama
-            </button>
-          </div>
-        ) : (
-          <div className="tables-grid">
-            {lobbyTables.map((table) => {
-              const isFull = table.playerCount >= table.maxPlayers;
-              return (
-                <div key={table.tableId} className="table-card">
-                  <div className="table-card-top">
-                    <div className="table-title-group">
-                      <span className="table-name">{table.name}</span>
-                      <span className={`mode-badge ${table.allowBots !== false ? 'mode-bot' : 'mode-human'}`}>
+              {lobbyTables.length > 0 && (
+                <button
+                  type="button"
+                  className="fc-soft-btn fc-soft-btn-danger"
+                  onClick={handleClearAllTables}
+                  disabled={clearingAll}
+                  title="Hapus semua meja"
+                >
+                  <TrashIcon size={14} />
+                </button>
+              )}
+
+              <button
+                type="button"
+                className="fc-soft-btn"
+                onClick={handleLogout}
+                title="Keluar"
+              >
+                <LogOutIcon size={14} />
+                <span className="hide-xs">Keluar</span>
+              </button>
+            </div>
+          </header>
+
+          {/* Table Columns Header */}
+          <div className="fc-rooms-table-wrap">
+            <div className="fc-rooms-thead">
+              <span>ROOM / BLINDS</span>
+              <span>BUY-IN</span>
+              <span>TYPE</span>
+              <span>MODE</span>
+              <span>PLAYERS</span>
+              <span className="align-right">ACTION</span>
+            </div>
+
+            {loading ? (
+              <div className="fc-rooms-empty">Memuat daftar meja...</div>
+            ) : lobbyTables.length === 0 ? (
+              <div className="fc-rooms-empty">
+                <p>Belum ada meja aktif saat ini.</p>
+                <button
+                  type="button"
+                  className="fc-join-btn"
+                  onClick={() => setShowCreateModal(true)}
+                >
+                  + Buat Meja Pertama
+                </button>
+              </div>
+            ) : (
+              <div className="fc-rooms-tbody">
+                {lobbyTables.map((table) => {
+                  const isFull = table.playerCount >= table.maxPlayers;
+                  const typeLabel =
+                    table.maxPlayers === 2
+                      ? 'Heads-Up'
+                      : table.maxPlayers <= 6
+                      ? '6-Max'
+                      : '9-Max';
+                  const isPinkType = table.maxPlayers > 6;
+
+                  return (
+                    <div key={table.tableId} className="fc-room-row">
+                      <div className="fc-col-blinds">
+                        <span className="fc-room-row-name">{table.name}</span>
+                        <span className="fc-room-row-stakes">
+                          ${table.smallBlind} / ${table.bigBlind}
+                        </span>
+                      </div>
+
+                      <div className="fc-col-buyin">${table.minBuyIn.toLocaleString()}</div>
+
+                      <div className={`fc-col-type ${isPinkType ? 'is-pink' : 'is-cyan'}`}>
+                        {typeLabel}
+                      </div>
+
+                      <div className="fc-col-mode">
                         {table.allowBots !== false ? (
-                          <>
-                            <BotIcon size={12} />
+                          <span className="fc-inline-meta">
+                            <BotIcon size={14} />
                             <span>Bot AI</span>
-                          </>
+                          </span>
                         ) : (
-                          <>
-                            <UsersIcon size={12} />
-                            <span>Khusus Manusia</span>
-                          </>
+                          <span className="fc-inline-meta">
+                            <UsersIcon size={14} />
+                            <span>Manusia</span>
+                          </span>
                         )}
-                      </span>
-                    </div>
-                    <span className={`status-pill ${table.phase === 'waiting' ? 'status-waiting' : 'status-live'}`}>
-                      {table.phase === 'waiting' ? 'Menunggu' : 'Bermain'}
-                    </span>
-                  </div>
+                      </div>
 
-                  <div className="table-card-body">
-                    <div className="stat-row">
-                      <span className="stat-label">Stakes:</span>
-                      <span className="stat-value">${table.smallBlind} / ${table.bigBlind}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span className="stat-label">Pemain:</span>
-                      <span className="stat-value">{table.playerCount} / {table.maxPlayers}</span>
-                    </div>
-                    <div className="stat-row">
-                      <span className="stat-label">Min Buy-In:</span>
-                      <span className="stat-value">${table.minBuyIn.toLocaleString()}</span>
-                    </div>
-                  </div>
+                      <div className="fc-col-players">
+                        <UsersIcon size={14} />
+                        <span>
+                          {table.playerCount} / {table.maxPlayers}
+                        </span>
+                      </div>
 
-                  <div className="table-card-footer" style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                      className="btn btn-primary btn-join-table"
-                      style={{ flex: 1 }}
-                      disabled={isFull}
-                      onClick={() => handleOpenBuyIn(table)}
-                    >
-                      {isFull ? 'Penuh' : 'Bergabung'}
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-outline btn-sm"
-                      style={{ borderColor: '#ef4444', color: '#ef4444', padding: '0 12px' }}
-                      title="Hapus Meja Ini"
-                      onClick={(e) => handleDeleteTable(table.tableId, e)}
-                    >
-                      <TrashIcon size={15} />
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
+                      <div className="fc-col-action">
+                        <button
+                          type="button"
+                          className="fc-join-btn"
+                          disabled={isFull}
+                          onClick={() => handleOpenBuyIn(table)}
+                        >
+                          {isFull ? 'FULL' : 'JOIN'}
+                        </button>
+                        <button
+                          type="button"
+                          className="fc-row-del-btn"
+                          title="Hapus Meja Ini"
+                          onClick={(e) => handleDeleteTable(table.tableId, e)}
+                        >
+                          <TrashIcon size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        )}
-      </main>
+        </section>
+
+        {/* Right Striped Sidebar Panel (matches poker rooms+signup signin@2x.png) */}
+        <aside className="fc-lobby-sidebar">
+          <div className="fc-side-tabs">
+            <button
+              type="button"
+              className={`fc-side-tab ${sideTab === 'rooms' ? 'is-active' : ''}`}
+              onClick={() => setSideTab('rooms')}
+              title="Active Tables"
+            >
+              <TableMiniIcon size={18} />
+            </button>
+            <button
+              type="button"
+              className={`fc-side-tab ${sideTab === 'info' ? 'is-active' : ''}`}
+              onClick={() => setSideTab('info')}
+              title="Lobby Stats"
+            >
+              <UsersIcon size={18} />
+            </button>
+          </div>
+
+          <div className="fc-side-thead">
+            <span>TABLE</span>
+            <span>STATUS</span>
+            <span className="align-right">STAKES</span>
+          </div>
+
+          <div className="fc-side-list">
+            {lobbyTables.length === 0 ? (
+              <div className="fc-side-empty">
+                <p>0 meja aktif</p>
+                <span>Total pemain: {totalOnlinePlayers}</span>
+              </div>
+            ) : (
+              lobbyTables.map((t) => (
+                <div
+                  key={t.tableId}
+                  className="fc-side-row"
+                  onClick={() => handleOpenBuyIn(t)}
+                >
+                  <span className="fc-side-name">{t.name}</span>
+                  <span className={`fc-side-dot ${t.phase === 'waiting' ? 'is-wait' : 'is-live'}`}>
+                    {t.phase === 'waiting' ? 'Wait' : 'Live'}
+                  </span>
+                  <span className="fc-side-chips">${t.smallBlind}/${t.bigBlind}</span>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className="fc-side-footer">
+            <span>Meja Aktif: <strong>{lobbyTables.length}</strong></span>
+            <span>Pemain: <strong>{totalOnlinePlayers}</strong></span>
+          </div>
+        </aside>
+      </div>
 
       {/* Create Table Modal */}
       {showCreateModal && (
@@ -396,7 +456,6 @@ export default function LobbyPage() {
                 </div>
               </div>
 
-              {/* Pilihan Bot atau Bukan Bot */}
               <div className="form-group">
                 <label>Mode Bot AI</label>
                 <div className="bot-mode-selector">
@@ -472,6 +531,7 @@ export default function LobbyPage() {
                 <div className="buyin-slider-container">
                   <input
                     type="range"
+                    className="fc-raise-slider"
                     min={selectedTable.minBuyIn}
                     max={Math.min(selectedTable.minBuyIn * 5, user?.chips || 10000)}
                     step={selectedTable.bigBlind}
