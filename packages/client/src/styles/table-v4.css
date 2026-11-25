@@ -1,0 +1,902 @@
+/* ==========================================================================
+   FIGCRAFT SOFT-NEUMORPHIC SLATE-INDIGO THEME (v4)
+   Matches exported FigCraft design system:
+   - full table.png, table play.png, layout,button.png, settings.png
+   - poker rooms+signup signin@2x.png, signup.png, cards.svg
+   ========================================================================== */
+
+:root {
+  --fc-bg-1: #4b587b;
+  --fc-bg-2: #343e59;
+  --fc-surface-top: #556388;
+  --fc-surface-bot: #3a4462;
+  --fc-table-top: #526085;
+  --fc-table-bot: #35405c;
+  --fc-cyan: #5ce1ff;
+  --fc-blue: #3b9eff;
+  --fc-pink: #ff6ca8;
+  --fc-purple: #c084fc;
+  --fc-peach: #ffb673;
+  --fc-text: #eef3ff;
+  --fc-muted: #a6b4d4;
+}
+
+/* Global Diagonal Pinstripe Slate-Indigo Canvas */
+body,
+html {
+  background-color: #3a4460;
+  background-image:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0.025) 6px,
+      transparent 6px,
+      transparent 16px
+    ),
+    radial-gradient(circle at 22% 18%, #59678d 0%, #3d4866 48%, #2e3750 100%);
+  color: var(--fc-text);
+}
+
+/* ==========================================================================
+   AUTH PAGES (Login & Register — matches signup.png)
+   ========================================================================== */
+
+.auth-page {
+  background: transparent !important;
+  position: relative;
+}
+
+.auth-card {
+  background: linear-gradient(155deg, rgba(94, 108, 146, 0.72), rgba(56, 66, 94, 0.86)) !important;
+  backdrop-filter: blur(22px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 22px !important;
+  box-shadow:
+    0 24px 55px rgba(14, 20, 38, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+}
+
+.auth-logo h1 {
+  background: linear-gradient(135deg, #99f6ff, #60a5fa) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.form-group input,
+.form-group select {
+  background: rgba(38, 46, 70, 0.58) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: 10px !important;
+  box-shadow: inset 0 2px 6px rgba(15, 20, 38, 0.35);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  border-color: var(--fc-cyan) !important;
+  box-shadow: 0 0 0 2px rgba(92, 225, 255, 0.22);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #7be8ff 0%, #3b9eff 100%) !important;
+  color: #0b1930 !important;
+  font-weight: 800 !important;
+  box-shadow:
+    0 6px 18px rgba(59, 158, 255, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.btn-primary:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 24px rgba(92, 225, 255, 0.48) !important;
+}
+
+.auth-link a {
+  color: var(--fc-cyan) !important;
+}
+
+/* ==========================================================================
+   LOBBY PAGE (matches poker rooms+signup signin@2x.png)
+   ========================================================================== */
+
+.lobby-page {
+  background: transparent;
+}
+
+.lobby-navbar {
+  background: rgba(54, 64, 92, 0.72) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 8px 24px rgba(15, 21, 40, 0.28);
+}
+
+.navbar-brand h1 {
+  color: #e8f1ff !important;
+  letter-spacing: 0.5px;
+}
+
+.brand-suit {
+  color: var(--fc-cyan) !important;
+}
+
+.user-chips-pill {
+  background: rgba(45, 55, 82, 0.75) !important;
+  border: 1px solid rgba(92, 225, 255, 0.28) !important;
+  color: var(--fc-cyan) !important;
+  box-shadow: inset 0 2px 5px rgba(12, 18, 34, 0.35);
+}
+
+.table-card {
+  background: linear-gradient(155deg, rgba(90, 104, 142, 0.65), rgba(56, 66, 94, 0.8)) !important;
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  border-radius: 18px !important;
+  box-shadow:
+    0 16px 32px rgba(15, 21, 40, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16) !important;
+}
+
+.table-card:hover {
+  border-color: rgba(92, 225, 255, 0.48) !important;
+  box-shadow: 0 18px 36px rgba(15, 21, 40, 0.45) !important;
+}
+
+.table-card-body {
+  background: rgba(35, 43, 66, 0.42) !important;
+  border-radius: 12px !important;
+}
+
+.modal-card {
+  background: linear-gradient(160deg, #4b587c, #343e5a) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 20px !important;
+}
+
+/* ==========================================================================
+   POKER TABLE PAGE — FIGCRAFT NEUMORPHIC ARENA
+   ========================================================================== */
+
+.table-page-container {
+  background:
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255, 255, 255, 0.025) 0px,
+      rgba(255, 255, 255, 0.025) 6px,
+      transparent 6px,
+      transparent 16px
+    ),
+    radial-gradient(circle at 25% 15%, #5b6a90 0%, #3f4a69 52%, #2f3852 100%) !important;
+}
+
+/* Top Floating Controls */
+.fc-top-bar {
+  background: transparent !important;
+  border-bottom: none !important;
+  backdrop-filter: none !important;
+  padding: 12px 18px 6px !important;
+  z-index: 25;
+}
+
+.fc-top-left-cluster,
+.fc-top-right-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fc-center-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(45, 55, 82, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 5px 14px;
+  border-radius: 20px;
+  box-shadow: 0 6px 16px rgba(16, 22, 42, 0.3);
+}
+
+.fc-center-meta .room-title {
+  color: #eef3ff !important;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.fc-center-meta .blinds-badge {
+  background: rgba(92, 225, 255, 0.12);
+  color: var(--fc-cyan);
+  font-weight: 700;
+  font-size: 0.78rem;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.fc-center-meta .phase-badge {
+  background: rgba(192, 132, 252, 0.18);
+  color: #e9d5ff;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  padding: 2px 8px;
+}
+
+/* Neumorphic Floating Icon Buttons (matching layout,button.png) */
+.fc-neu-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(145deg, rgba(104, 118, 158, 0.65), rgba(60, 71, 102, 0.85));
+  color: #dbe7ff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  box-shadow:
+    6px 6px 14px rgba(17, 23, 42, 0.45),
+    -2px -2px 8px rgba(130, 148, 196, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: transform 0.15s ease, filter 0.15s ease, border-color 0.15s ease;
+}
+
+.fc-neu-btn:hover {
+  filter: brightness(1.1);
+  border-color: rgba(92, 225, 255, 0.45);
+  transform: translateY(-1px);
+}
+
+.fc-neu-btn.is-active {
+  border-color: var(--fc-cyan);
+  color: var(--fc-cyan);
+  box-shadow: 0 0 16px rgba(92, 225, 255, 0.3);
+}
+
+.fc-neu-pill-btn {
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: linear-gradient(145deg, rgba(104, 118, 158, 0.6), rgba(60, 71, 102, 0.85));
+  color: #eef3ff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow:
+    5px 5px 12px rgba(17, 23, 42, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  transition: all 0.15s ease;
+}
+
+.fc-bot-add-btn {
+  border-color: rgba(192, 132, 252, 0.4);
+  color: #e9d5ff;
+}
+.fc-bot-add-btn:hover {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.55), rgba(99, 102, 241, 0.55));
+  border-color: #c084fc;
+}
+
+.fc-exit-btn:hover {
+  border-color: rgba(255, 108, 168, 0.65);
+  color: var(--fc-pink);
+}
+
+/* Settings Drawer (Exact match for settings.png) */
+.fc-settings-drawer {
+  position: absolute;
+  top: 64px;
+  left: 18px;
+  width: 248px;
+  background: linear-gradient(160deg, rgba(92, 106, 144, 0.88), rgba(55, 65, 94, 0.94));
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 18px;
+  padding: 18px;
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  box-shadow:
+    0 20px 45px rgba(12, 18, 36, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  animation: speechPopV2 0.2s ease-out;
+}
+
+.fc-settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fc-settings-header h3 {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e8f0ff;
+}
+
+.fc-drawer-close {
+  background: transparent;
+  border: none;
+  color: var(--fc-muted);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.fc-settings-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.84rem;
+  color: #dce6ff;
+}
+
+.fc-settings-label-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fc-settings-val {
+  color: var(--fc-cyan);
+  font-weight: 700;
+}
+
+.fc-toggle-row {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.fc-switch {
+  width: 48px;
+  height: 24px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(34, 42, 64, 0.72);
+  position: relative;
+  cursor: pointer;
+  padding: 0;
+  box-shadow: inset 0 2px 5px rgba(10, 15, 30, 0.5);
+  transition: background 0.2s ease;
+}
+
+.fc-switch-knob {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #94a3b8;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fc-switch.is-on .fc-switch-knob {
+  transform: translateX(23px);
+  background: linear-gradient(135deg, #99f6ff, #38bdf8);
+  box-shadow: 0 0 12px rgba(92, 225, 255, 0.85);
+}
+
+/* ==========================================================================
+   SLATE-INDIGO OVAL POKER TABLE (matches table play.png & full table.png)
+   ========================================================================== */
+
+.poker-oval-felt.fc-oval-table {
+  background: radial-gradient(ellipse at 50% 38%, #5b698f 0%, #445070 58%, #343e5a 100%) !important;
+  border: 12px solid rgba(46, 56, 82, 0.92) !important;
+  border-radius: 230px !important;
+  box-shadow:
+    0 28px 65px rgba(12, 18, 36, 0.62),
+    -8px -8px 28px rgba(132, 150, 198, 0.14),
+    inset 0 2px 3px rgba(255, 255, 255, 0.18),
+    inset 0 -12px 35px rgba(20, 27, 48, 0.55) !important;
+}
+
+.table-rail-inner.fc-table-inner-bevel {
+  inset: 14px !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: 215px !important;
+}
+
+/* Dealer Booth harmonized with FigCraft Slate-Indigo + Cyan/Gold accents */
+.dealer-avatar-frame {
+  background: linear-gradient(145deg, #99f6ff 0%, #6366f1 55%, #f472b6 100%) !important;
+  box-shadow:
+    0 10px 26px rgba(14, 20, 38, 0.62),
+    0 0 20px rgba(92, 225, 255, 0.35) !important;
+}
+
+.dealer-role-pill {
+  background: linear-gradient(135deg, #7be8ff, #3b9eff) !important;
+  color: #0b1930 !important;
+  border-color: rgba(255, 255, 255, 0.75) !important;
+}
+
+.deck-card {
+  background: linear-gradient(145deg, #5d6c94 0%, #333e5c 100%) !important;
+  border: 1.5px solid rgba(153, 246, 255, 0.65) !important;
+}
+
+.dealer-speech {
+  background: rgba(42, 51, 76, 0.88) !important;
+  border-color: rgba(92, 225, 255, 0.35) !important;
+}
+
+.dealer-name {
+  color: var(--fc-cyan) !important;
+}
+
+/* Pot Display (TOTAL POT : 5000) */
+.fc-pot-pill {
+  background: rgba(38, 46, 70, 0.52) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  padding: 5px 16px !important;
+  border-radius: 16px !important;
+  font-size: 0.95rem !important;
+  letter-spacing: 0.6px;
+}
+
+.fc-pot-pill .pot-label {
+  color: #b8c6e6;
+  font-weight: 600;
+  font-size: 0.78rem;
+}
+
+.fc-pot-pill .pot-amount {
+  color: var(--fc-cyan) !important;
+  font-weight: 800;
+  text-shadow: 0 0 12px rgba(92, 225, 255, 0.45);
+}
+
+/* ==========================================================================
+   FIGCRAFT 4-COLOR NEON GLASS CARDS (matches cards.svg & full table.png)
+   ========================================================================== */
+
+.fc-card-scene .poker-card {
+  border-radius: 10px !important;
+  box-shadow:
+    0 10px 22px rgba(14, 20, 40, 0.52),
+    inset 0 1px 1px rgba(255, 255, 255, 0.24) !important;
+}
+
+.fc-card-scene .fc-card-face {
+  background: linear-gradient(165deg, rgba(114, 130, 174, 0.82) 0%, rgba(65, 76, 108, 0.94) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  padding: 6px 7px !important;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.fc-card-top-suit {
+  align-self: flex-start;
+  line-height: 1;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.28));
+}
+
+.fc-card-rank-wrap {
+  align-self: flex-end;
+  margin-top: auto;
+  line-height: 0.92;
+  padding-right: 1px;
+  padding-bottom: 1px;
+}
+
+.fc-card-rank {
+  font-size: 1.95rem;
+  font-weight: 900;
+  letter-spacing: -1px;
+  display: inline-block;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fc-card-rank.is-ten {
+  font-size: 1.55rem;
+  letter-spacing: -2px;
+}
+
+.fc-card-scene.card-medium .fc-card-rank {
+  font-size: 1.55rem;
+}
+.fc-card-scene.card-medium .fc-card-rank.is-ten {
+  font-size: 1.25rem;
+}
+
+.fc-card-scene.card-mini .fc-card-rank {
+  font-size: 1.15rem;
+}
+.fc-card-scene.card-mini .fc-card-rank.is-ten {
+  font-size: 0.95rem;
+}
+
+/* 4-Color Neon Suit Gradients matching FigCraft cards.svg */
+.fc-suit-hearts .fc-card-rank {
+  background-image: linear-gradient(160deg, #ffb4d2 0%, #f45b93 100%);
+  filter: drop-shadow(0 2px 8px rgba(244, 91, 147, 0.35));
+}
+
+.fc-suit-clubs .fc-card-rank {
+  background-image: linear-gradient(160deg, #e2c6ff 0%, #9b72ff 100%);
+  filter: drop-shadow(0 2px 8px rgba(155, 114, 255, 0.35));
+}
+
+.fc-suit-diamonds .fc-card-rank {
+  background-image: linear-gradient(160deg, #a6f7ff 0%, #38bdf8 100%);
+  filter: drop-shadow(0 2px 8px rgba(56, 189, 248, 0.35));
+}
+
+.fc-suit-spades .fc-card-rank {
+  background-image: linear-gradient(160deg, #bdd4ff 0%, #638cff 100%);
+  filter: drop-shadow(0 2px 8px rgba(99, 140, 255, 0.35));
+}
+
+/* Harmonized Slate-Indigo & Cyan Card Back */
+.fc-card-scene .fc-card-back {
+  background: linear-gradient(150deg, #5d6e99 0%, #343f5e 100%) !important;
+  border: 1.5px solid rgba(255, 255, 255, 0.28) !important;
+  padding: 4px !important;
+}
+
+.fc-back-frame {
+  border-color: rgba(92, 225, 255, 0.45) !important;
+  background: radial-gradient(circle at center, #495880 0%, #2b344e 100%) !important;
+}
+
+.fc-back-pattern {
+  background-image:
+    repeating-linear-gradient(45deg, rgba(92, 225, 255, 0.14) 0px, rgba(92, 225, 255, 0.14) 2px, transparent 2px, transparent 7px),
+    repeating-linear-gradient(-45deg, rgba(192, 132, 252, 0.14) 0px, rgba(192, 132, 252, 0.14) 2px, transparent 2px, transparent 7px) !important;
+}
+
+.fc-back-medallion {
+  background: linear-gradient(135deg, #7be8ff, #6366f1) !important;
+  color: #131c36 !important;
+  box-shadow: 0 0 10px rgba(92, 225, 255, 0.55) !important;
+}
+
+.fc-card-scene.card-highlight .poker-card {
+  box-shadow:
+    0 0 0 2px var(--fc-cyan),
+    0 0 24px rgba(92, 225, 255, 0.78),
+    0 12px 24px rgba(10, 15, 32, 0.6) !important;
+}
+
+/* Empty Community Card Slots */
+.empty-slot .card-placeholder {
+  background: rgba(34, 42, 65, 0.38) !important;
+  border: 1px dashed rgba(255, 255, 255, 0.14) !important;
+  border-radius: 10px !important;
+}
+
+/* ==========================================================================
+   PLAYER SEATS (FigCraft Rounded-Square Avatars + Glowing Orbs)
+   ========================================================================== */
+
+.player-avatar {
+  border-radius: 14px !important;
+  background: linear-gradient(145deg, #64739a, #3b4666) !important;
+  border: 2px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: 0 6px 14px rgba(12, 18, 36, 0.45);
+}
+
+.player-seat.is-me .player-avatar {
+  border-color: var(--fc-cyan) !important;
+  box-shadow: 0 0 16px rgba(92, 225, 255, 0.45);
+}
+
+.timer-circle-progress {
+  stroke: var(--fc-pink) !important;
+}
+
+.player-card-info {
+  background: rgba(40, 49, 74, 0.84) !important;
+  border: 1px solid rgba(255, 255, 255, 0.13) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 6px 14px rgba(12, 18, 36, 0.35);
+}
+
+.player-seat.active-turn .player-card-info {
+  border-color: var(--fc-cyan) !important;
+  box-shadow: 0 0 18px rgba(92, 225, 255, 0.42) !important;
+}
+
+.player-chips {
+  color: var(--fc-cyan) !important;
+}
+
+.badge-dealer {
+  background: linear-gradient(135deg, #ffd18c, #f58c58) !important;
+  color: #3a1904 !important;
+  border-radius: 999px !important;
+  padding: 2px 6px !important;
+  box-shadow: 0 2px 8px rgba(245, 140, 88, 0.55);
+}
+
+.badge-blind {
+  background: linear-gradient(135deg, #d896ff, #9333ea) !important;
+  color: #fff !important;
+  border-radius: 999px !important;
+  padding: 2px 6px !important;
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.5);
+}
+
+.badge-bot {
+  background: linear-gradient(135deg, #60a5fa, #4f46e5) !important;
+  border-radius: 999px !important;
+  padding: 2px 6px !important;
+}
+
+.folded-text {
+  background: linear-gradient(135deg, #7dd3fc, #3b82f6) !important;
+  color: #0b1930 !important;
+  border-radius: 8px !important;
+  padding: 2px 8px !important;
+  box-shadow: 0 4px 10px rgba(59, 130, 246, 0.4);
+}
+
+.seat-bet-chip {
+  background: rgba(38, 46, 70, 0.78) !important;
+  border-color: rgba(92, 225, 255, 0.3) !important;
+  color: #e2eeff !important;
+}
+
+.winner-banner {
+  background: linear-gradient(135deg, #7be8ff 0%, #6366f1 55%, #f472b6 100%) !important;
+  color: #091326 !important;
+  box-shadow: 0 0 28px rgba(92, 225, 255, 0.65) !important;
+}
+
+/* ==========================================================================
+   BOTTOM HUD & FIGCRAFT ACTION DOCK (matches full table.png & layout,button.png)
+   ========================================================================== */
+
+.fc-bottom-hud {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0 18px calc(12px + env(safe-area-inset-bottom, 0px));
+  gap: 12px;
+  z-index: 30;
+  flex-shrink: 0;
+  pointer-events: none;
+}
+
+.fc-bottom-left-hud {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  pointer-events: auto;
+}
+
+.fc-chat-dot {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--fc-pink);
+  box-shadow: 0 0 8px var(--fc-pink);
+}
+
+.fc-my-chips-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: rgba(42, 51, 76, 0.78);
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  color: #eef3ff;
+  font-weight: 800;
+  font-size: 0.92rem;
+  box-shadow:
+    0 8px 18px rgba(14, 20, 38, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+.fc-action-dock-container {
+  width: auto !important;
+  padding: 0 !important;
+  margin-left: auto;
+}
+
+.fc-action-dock {
+  background: linear-gradient(155deg, rgba(84, 98, 134, 0.72), rgba(52, 62, 90, 0.9)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  border-radius: 18px !important;
+  padding: 12px 14px !important;
+  min-width: 390px;
+  box-shadow:
+    0 16px 36px rgba(12, 18, 36, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18) !important;
+}
+
+.fc-raise-readout-row {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.fc-raise-value {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #eef3ff;
+  text-shadow: 0 0 10px rgba(92, 225, 255, 0.35);
+}
+
+/* Neon Cyan-to-Pink Gradient Slider */
+.fc-raise-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #5ce1ff 0%, #c084fc 55%, #ff6ca8 100%);
+  outline: none;
+  cursor: pointer;
+}
+
+.fc-raise-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: linear-gradient(145deg, #8fa2cf, #4d5c84);
+  border: 2px solid #eef3ff;
+  box-shadow: 0 2px 10px rgba(12, 18, 36, 0.65);
+}
+
+.fc-preset-btn {
+  background: linear-gradient(145deg, rgba(96, 110, 148, 0.55), rgba(58, 69, 98, 0.85)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: #e2ebff !important;
+  border-radius: 10px !important;
+  padding: 6px 8px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.4px;
+  box-shadow: 0 4px 10px rgba(14, 20, 38, 0.32);
+}
+
+.fc-preset-btn:hover {
+  border-color: rgba(92, 225, 255, 0.55) !important;
+  color: #fff !important;
+}
+
+.fc-btn-fold {
+  background: linear-gradient(135deg, #ff88aa 0%, #f43f7d 100%) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 6px 16px rgba(244, 63, 125, 0.45),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  gap: 5px;
+}
+
+.fc-btn-slate {
+  background: linear-gradient(145deg, rgba(98, 112, 150, 0.65), rgba(58, 68, 98, 0.9)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+  color: #eef3ff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 14px rgba(14, 20, 38, 0.35);
+}
+
+.fc-btn-slate:hover {
+  border-color: rgba(92, 225, 255, 0.45) !important;
+}
+
+.fc-btn-raise {
+  background: linear-gradient(135deg, #7be8ff 0%, #3b9eff 100%) !important;
+  color: #0b1930 !important;
+  font-weight: 800 !important;
+  border-radius: 12px !important;
+  box-shadow:
+    0 6px 18px rgba(59, 158, 255, 0.48),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  gap: 5px;
+}
+
+.fc-btn-allin-pill {
+  background: linear-gradient(135deg, #c084fc 0%, #7c3aed 100%) !important;
+  color: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.4);
+}
+
+.fc-chat-drawer {
+  background: linear-gradient(160deg, rgba(84, 98, 134, 0.92), rgba(48, 57, 84, 0.96)) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  border-radius: 16px !important;
+  bottom: 70px;
+  top: auto !important;
+  left: 18px;
+  right: auto !important;
+}
+
+/* ==========================================================================
+   MOBILE PORTRAIT — FULL 1-PAGE ZERO-SCROLL OVERRIDES FOR v4
+   ========================================================================== */
+@media (max-width: 768px) and (orientation: portrait) {
+  .fc-top-bar {
+    padding: 8px 10px 4px !important;
+  }
+
+  .fc-center-meta {
+    padding: 3px 10px;
+    gap: 5px;
+  }
+
+  .fc-neu-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+  }
+
+  .fc-neu-pill-btn {
+    height: 32px;
+    padding: 0 8px;
+    font-size: 0.7rem;
+  }
+
+  .fc-bottom-hud {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 4px 8px calc(8px + env(safe-area-inset-bottom, 0px)) !important;
+    gap: 6px;
+  }
+
+  .fc-bottom-left-hud {
+    justify-content: space-between;
+  }
+
+  .fc-my-chips-pill {
+    height: 32px;
+    padding: 0 10px;
+    font-size: 0.78rem;
+  }
+
+  .fc-action-dock-container {
+    width: 100% !important;
+    margin-left: 0;
+  }
+
+  .fc-action-dock {
+    min-width: 0 !important;
+    width: 100% !important;
+    padding: 8px 10px !important;
+    border-radius: 14px !important;
+  }
+
+  .fc-raise-value {
+    font-size: 0.85rem;
+  }
+
+  .fc-card-scene .fc-card-face {
+    padding: 4px 5px !important;
+  }
+
+  .card-slot .fc-card-rank {
+    font-size: 1.25rem !important;
+  }
+  .card-slot .fc-card-rank.is-ten {
+    font-size: 1rem !important;
+  }
+
+  .fc-settings-drawer {
+    left: 10px;
+    top: 52px;
+    width: calc(100vw - 20px);
+    max-width: 280px;
+  }
+
+  .fc-chat-drawer {
+    left: 10px !important;
+    right: 10px !important;
+    bottom: 56px !important;
+    width: calc(100vw - 20px) !important;
+    height: 240px !important;
+  }
+}

@@ -4,18 +4,41 @@
  */
 
 const STORAGE_KEY = 'p0ker_sound_muted';
+const VOLUME_KEY = 'p0ker_sound_volume';
 
 class SoundEngine {
   private ctx: AudioContext | null = null;
   private noiseBuffer: AudioBuffer | null = null;
   private muted: boolean = false;
+  private volume: number = 0.75;
 
   constructor() {
     try {
       this.muted = localStorage.getItem(STORAGE_KEY) === 'true';
+      const savedVol = Number(localStorage.getItem(VOLUME_KEY));
+      if (!Number.isNaN(savedVol) && savedVol >= 0 && savedVol <= 1 && localStorage.getItem(VOLUME_KEY) !== null) {
+        this.volume = savedVol;
+      }
     } catch {
       this.muted = false;
     }
+  }
+
+  public getVolume(): number {
+    return this.volume;
+  }
+
+  public setVolume(val: number): void {
+    this.volume = Math.max(0, Math.min(1, val));
+    try {
+      localStorage.setItem(VOLUME_KEY, String(this.volume));
+    } catch {
+      // ignore
+    }
+  }
+
+  private vol(base: number): number {
+    return Math.max(0.0005, base * this.volume);
   }
 
   private getContext(): AudioContext | null {
@@ -87,7 +110,7 @@ class SoundEngine {
 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.001, start);
-    gain.gain.linearRampToValueAtTime(0.26, start + 0.012);
+    gain.gain.linearRampToValueAtTime(this.vol(0.32), start + 0.012);
     gain.gain.exponentialRampToValueAtTime(0.001, start + 0.085);
 
     noise.connect(filter);
@@ -132,7 +155,7 @@ class SoundEngine {
 
     const gain = ctx.createGain();
     gain.gain.setValueAtTime(0.001, start);
-    gain.gain.linearRampToValueAtTime(0.22, start + 0.015);
+    gain.gain.linearRampToValueAtTime(this.vol(0.28), start + 0.015);
     gain.gain.exponentialRampToValueAtTime(0.001, start + 0.09);
 
     noise.connect(filter);

@@ -10,10 +10,10 @@ interface PotDisplayProps {
 
 export const PotDisplay: React.FC<PotDisplayProps> = ({ pot, sidePots = [] }) => {
   return (
-    <div className="pot-display-wrapper">
-      <div className="pot-pill">
-        <PokerChipIcon size={17} className="pot-icon" />
-        <span className="pot-label">POT:</span>
+    <div className="pot-display-wrapper fc-pot-wrapper">
+      <div className="pot-pill fc-pot-pill">
+        <PokerChipIcon size={17} variant="blue" className="pot-icon" />
+        <span className="pot-label">TOTAL POT :</span>
         <span className="pot-amount">${pot.toLocaleString()}</span>
       </div>
 

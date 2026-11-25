@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { PlayerAction } from '@p0ker/shared';
+import { FoldArrowIcon, RaiseArrowIcon } from '../icons/CasinoIcons';
 
 interface ActionDockProps {
   currentBet: number;
@@ -40,103 +41,122 @@ export const ActionDock: React.FC<ActionDockProps> = ({
     setRaiseAmount(amt);
   };
 
+  const canRaise = myChips > toCall && maxRaise > currentBet;
+
   return (
-    <div className="action-dock-container">
-      <div className="action-dock">
-        {/* Raise controls */}
-        {myChips > toCall && (
-          <div className="raise-panel">
-            <div className="presets-bar">
-              <button
-                type="button"
-                className="btn-preset"
-                onClick={() => setRaiseAmount(minRaise)}
-              >
-                Min
-              </button>
-              <button
-                type="button"
-                className="btn-preset"
-                onClick={() => setPresetRaise(0.5)}
-              >
-                1/2 Pot
-              </button>
-              <button
-                type="button"
-                className="btn-preset"
-                onClick={() => setPresetRaise(1.0)}
-              >
-                Pot
-              </button>
-              <button
-                type="button"
-                className="btn-preset"
-                onClick={() => setRaiseAmount(maxRaise)}
-              >
-                Max
-              </button>
+    <div className="action-dock-container fc-action-dock-container">
+      <div className="action-dock fc-action-dock">
+        {/* Raise Slider & Presets */}
+        {canRaise && (
+          <div className="raise-panel fc-raise-panel">
+            <div className="fc-raise-readout-row">
+              <span className="fc-raise-value">${raiseAmount.toLocaleString()}</span>
             </div>
 
-            <div className="slider-row">
+            <div className="slider-row fc-slider-row">
               <input
                 type="range"
-                className="raise-slider"
+                className="raise-slider fc-raise-slider"
                 min={minRaise}
                 max={maxRaise}
                 step={bigBlind}
                 value={raiseAmount}
                 onChange={handleSliderChange}
               />
-              <span className="raise-preview">${raiseAmount.toLocaleString()}</span>
+            </div>
+
+            <div className="presets-bar fc-presets-bar">
+              <button
+                type="button"
+                className="btn-preset fc-preset-btn"
+                onClick={() => setRaiseAmount(minRaise)}
+              >
+                MIN
+              </button>
+              <button
+                type="button"
+                className="btn-preset fc-preset-btn"
+                onClick={() => setPresetRaise(0.5)}
+              >
+                1/2
+              </button>
+              <button
+                type="button"
+                className="btn-preset fc-preset-btn"
+                onClick={() => setPresetRaise(1.0)}
+              >
+                POT
+              </button>
+              <button
+                type="button"
+                className="btn-preset fc-preset-btn"
+                onClick={() => setRaiseAmount(maxRaise)}
+              >
+                MAX
+              </button>
             </div>
           </div>
         )}
 
-        {/* Action Buttons */}
-        <div className="buttons-row">
+        {/* Primary Action Buttons (FigCraft Coral Fold, Slate Check/Call, Sky Raise/All-In) */}
+        <div className="buttons-row fc-buttons-row">
           <button
             type="button"
-            className="btn btn-action btn-fold"
+            className="btn btn-action btn-fold fc-btn-fold"
             onClick={() => onAction('fold')}
+            title="Fold"
           >
-            Fold
+            <FoldArrowIcon size={15} />
+            <span>FOLD</span>
           </button>
 
           {canCheck ? (
             <button
               type="button"
-              className="btn btn-action btn-check"
+              className="btn btn-action btn-check fc-btn-slate"
               onClick={() => onAction('check')}
             >
-              Check
+              CHECK
             </button>
           ) : (
             <button
               type="button"
-              className="btn btn-action btn-call"
+              className="btn btn-action btn-call fc-btn-slate"
               onClick={() => onAction('call')}
             >
-              Call ${toCall.toLocaleString()}
+              CALL ${toCall.toLocaleString()}
             </button>
           )}
 
-          {myChips > toCall && raiseAmount > currentBet && (
+          {canRaise && raiseAmount > currentBet ? (
             <button
               type="button"
-              className="btn btn-action btn-raise"
+              className="btn btn-action btn-raise fc-btn-raise"
               onClick={() => onAction('raise', raiseAmount)}
+              title={`Raise to $${raiseAmount.toLocaleString()}`}
             >
-              Raise to ${raiseAmount.toLocaleString()}
+              <span>RAISE</span>
+              <RaiseArrowIcon size={15} />
             </button>
-          )}
-
-          {myChips > 0 && (
+          ) : myChips > 0 ? (
             <button
               type="button"
-              className="btn btn-action btn-allin"
+              className="btn btn-action btn-allin fc-btn-raise"
               onClick={() => onAction('all-in')}
             >
-              All-In (${myChips.toLocaleString()})
+              <span>ALL-IN</span>
+              <RaiseArrowIcon size={15} />
+            </button>
+          ) : null}
+
+          {canRaise && myChips > 0 && (
+            <button
+              type="button"
+              className="btn btn-action btn-allin fc-btn-allin-pill"
+              onClick={() => onAction('all-in')}
+              title={`All-In ($${myChips.toLocaleString()})`}
+            >
+              ALL-IN
             </button>
           )}
         </div>

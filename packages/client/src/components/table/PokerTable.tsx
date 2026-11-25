@@ -9,10 +9,12 @@ import { soundEngine } from '../../utils/soundEngine';
 import {
   BotIcon,
   ChatIcon,
-  LogOutIcon,
+  ExitDoorIcon,
+  HomeIcon,
+  MenuBarsIcon,
+  PokerChipIcon,
   SoundOffIcon,
   SoundOnIcon,
-  SpadeEmblemIcon,
   TrophyIcon,
   UsersIcon,
 } from '../icons/CasinoIcons';
@@ -40,7 +42,9 @@ export const PokerTable: React.FC<PokerTableProps> = ({
 }) => {
   const [chatInput, setChatInput] = useState('');
   const [showChat, setShowChat] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [muted, setMuted] = useState(() => soundEngine.isMuted());
+  const [volume, setVolume] = useState(() => Math.round(soundEngine.getVolume() * 100));
   const [isDealing, setIsDealing] = useState(false);
   const [handEpoch, setHandEpoch] = useState(0);
 
@@ -79,7 +83,6 @@ export const PokerTable: React.FC<PokerTableProps> = ({
     const holeCardsChanged =
       Boolean(myHoleSig) && myHoleSig !== prevHoleSigRef.current;
 
-    // 1. New hand dealt -> deal hole cards sound + dealer animation
     if (enteredPreFlop || (tableState.phase === 'pre-flop' && holeCardsChanged)) {
       setHandEpoch((n) => n + 1);
       const activeCount = Math.max(
@@ -93,7 +96,6 @@ export const PokerTable: React.FC<PokerTableProps> = ({
     prevPhaseRef.current = tableState.phase;
     prevHoleSigRef.current = myHoleSig;
 
-    // 2. New community cards (Flop / Turn / River) -> flip sound + dealer animation
     const commCount = tableState.communityCards.length;
     if (commCount > prevCommCountRef.current) {
       const newlyDealt = commCount - prevCommCountRef.current;
@@ -102,20 +104,17 @@ export const PokerTable: React.FC<PokerTableProps> = ({
     }
     prevCommCountRef.current = commCount;
 
-    // 3. Pot increased -> chip clink
     if (tableState.pot > prevPotRef.current) {
       soundEngine.playChipBet();
     }
     prevPotRef.current = tableState.pot;
 
-    // 4. Winners announced -> celebratory chime
     const winnersLen = tableState.winners?.length || 0;
     if (winnersLen > 0 && prevWinnersLenRef.current === 0) {
       soundEngine.playWin();
     }
     prevWinnersLenRef.current = winnersLen;
 
-    // 5. Turn alert when it becomes our turn
     if (isMyTurn && !prevMyTurnRef.current) {
       soundEngine.playTurnAlert();
     }
@@ -145,6 +144,16 @@ export const PokerTable: React.FC<PokerTableProps> = ({
     }
   };
 
+  const handleVolumeChange = (nextVal: number) => {
+    soundEngine.unlock();
+    setVolume(nextVal);
+    soundEngine.setVolume(nextVal / 100);
+    if (nextVal > 0 && muted) {
+      soundEngine.setMuted(false);
+      setMuted(false);
+    }
+  };
+
   const handlePlayerAction = (action: PlayerAction, amount?: number) => {
     soundEngine.unlock();
     if (action === 'fold') soundEngine.playFold();
@@ -163,45 +172,54 @@ export const PokerTable: React.FC<PokerTableProps> = ({
   const winnerUserIds = new Set((tableState.winners || []).map((w) => w.userId));
   const totalSeats = tableState.maxPlayers || 9;
   const seats = Array.from({ length: totalSeats }, (_, i) => i + 1);
+  const canAddBot =
+    tableState.allowBots !== false &&
+    tableState.players.length < (tableState.maxPlayers || 9);
+  const hasBots =
+    tableState.allowBots !== false && tableState.players.some((p) => p.isBot);
 
   return (
     <div
-      className="poker-table-wrapper"
+      className="poker-table-wrapper fc-table-shell"
       onPointerDown={() => soundEngine.unlock()}
     >
-      {/* Top Header Bar */}
-      <header className="table-top-bar">
-        <div className="table-meta">
-          <span className="room-title">
-            <SpadeEmblemIcon size={17} />
-            <span>{tableState.name}</span>
-          </span>
-          <span className="blinds-badge">
-            Blinds: ${tableState.smallBlind} / ${tableState.bigBlind}
-          </span>
-          <span className={`phase-badge phase-${tableState.phase}`}>
-            {tableState.phase.toUpperCase()}
-          </span>
-        </div>
+      {/* Top Compact Floating Controls (FigCraft Neumorphic Style) */}
+      <header className="table-top-bar fc-top-bar">
+        <div className="fc-top-left-cluster">
+          <button
+            type="button"
+            className={`fc-neu-btn ${showSettings ? 'is-active' : ''}`}
+            onClick={() => setShowSettings((v) => !v)}
+            title="Settings"
+          >
+            <MenuBarsIcon size={17} />
+          </button>
 
-        <div className="table-top-actions">
-          {tableState.allowBots !== false &&
-            tableState.players.length < (tableState.maxPlayers || 9) && (
-              <button
-                type="button"
-                className="btn btn-primary btn-add-bot"
-                onClick={onAddBot}
-                title="Tambah Bot AI ke meja"
-              >
-                <BotIcon size={15} />
-                <span>+ Bot</span>
-              </button>
-            )}
+          <button
+            type="button"
+            className="fc-neu-btn"
+            onClick={onLeave}
+            title="Kembali ke Lobi"
+          >
+            <HomeIcon size={16} />
+          </button>
 
-          {tableState.allowBots !== false && tableState.players.some((p) => p.isBot) && (
+          {canAddBot && (
             <button
               type="button"
-              className="btn btn-outline btn-remove-bot"
+              className="fc-neu-pill-btn fc-bot-add-btn"
+              onClick={onAddBot}
+              title="Tambah Bot AI ke meja"
+            >
+              <BotIcon size={15} />
+              <span>+ Bot</span>
+            </button>
+          )}
+
+          {hasBots && (
+            <button
+              type="button"
+              className="fc-neu-pill-btn fc-bot-rem-btn"
               onClick={onRemoveBot}
               title="Keluarkan 1 Bot AI"
             >
@@ -212,13 +230,25 @@ export const PokerTable: React.FC<PokerTableProps> = ({
           {tableState.allowBots === false && (
             <span className="badge badge-human-only" title="Meja murni pemain manusia">
               <UsersIcon size={13} />
-              <span>Khusus Manusia</span>
+              <span>Manusia</span>
             </span>
           )}
+        </div>
 
+        <div className="table-meta fc-center-meta">
+          <span className="room-title">{tableState.name}</span>
+          <span className="blinds-badge">
+            ${tableState.smallBlind} / ${tableState.bigBlind}
+          </span>
+          <span className={`phase-badge phase-${tableState.phase}`}>
+            {tableState.phase.toUpperCase()}
+          </span>
+        </div>
+
+        <div className="table-top-actions fc-top-right-cluster">
           <button
             type="button"
-            className={`btn btn-secondary btn-icon-only btn-sound-toggle ${muted ? 'is-muted' : ''}`}
+            className={`fc-neu-btn btn-sound-toggle ${muted ? 'is-muted' : ''}`}
             onClick={handleToggleMute}
             title={muted ? 'Aktifkan suara kartu' : 'Matikan suara kartu'}
           >
@@ -227,29 +257,75 @@ export const PokerTable: React.FC<PokerTableProps> = ({
 
           <button
             type="button"
-            className="btn btn-secondary btn-icon-only btn-chat-toggle"
-            onClick={() => setShowChat(!showChat)}
-            title="Buka Chat Meja"
-          >
-            <ChatIcon size={16} />
-          </button>
-          <button
-            type="button"
-            className="btn btn-danger btn-leave"
+            className="fc-neu-btn fc-exit-btn"
             onClick={onLeave}
+            title="Keluar Meja"
           >
-            <LogOutIcon size={14} />
-            <span className="leave-label">Keluar</span>
+            <ExitDoorIcon size={17} />
           </button>
         </div>
       </header>
 
+      {/* FigCraft Frosted Settings Drawer (Left Side) */}
+      {showSettings && (
+        <aside className="fc-settings-drawer">
+          <div className="fc-settings-header">
+            <h3>Settings</h3>
+            <button
+              type="button"
+              className="fc-drawer-close"
+              onClick={() => setShowSettings(false)}
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="fc-settings-group">
+            <div className="fc-settings-label-row">
+              <span>Volume</span>
+              <span className="fc-settings-val">{volume}%</span>
+            </div>
+            <input
+              type="range"
+              className="fc-raise-slider"
+              min={0}
+              max={100}
+              value={volume}
+              onChange={(e) => handleVolumeChange(Number(e.target.value))}
+            />
+          </div>
+
+          <div className="fc-settings-group fc-toggle-row">
+            <span>Sound Effects</span>
+            <button
+              type="button"
+              className={`fc-switch ${!muted ? 'is-on' : ''}`}
+              onClick={handleToggleMute}
+              aria-pressed={!muted}
+            >
+              <span className="fc-switch-knob" />
+            </button>
+          </div>
+
+          <div className="fc-settings-group fc-toggle-row">
+            <span>Chatbox</span>
+            <button
+              type="button"
+              className={`fc-switch ${showChat ? 'is-on' : ''}`}
+              onClick={() => setShowChat((v) => !v)}
+              aria-pressed={showChat}
+            >
+              <span className="fc-switch-knob" />
+            </button>
+          </div>
+        </aside>
+      )}
+
       {/* Main Poker Arena */}
       <div className="poker-arena">
-        {/* The Oval Felt Table */}
-        <div className="poker-oval-felt">
-          {/* Rail Accent Ring */}
-          <div className="table-rail-inner" />
+        {/* The FigCraft Slate-Indigo Oval Table */}
+        <div className="poker-oval-felt fc-oval-table">
+          <div className="table-rail-inner fc-table-inner-bevel" />
 
           {/* Dedicated Female Casino Dealer (Non-playing) */}
           <DealerBooth
@@ -315,9 +391,43 @@ export const PokerTable: React.FC<PokerTableProps> = ({
         </div>
       </div>
 
+      {/* Bottom Bar: Chat & Chip Balance (Left) + Action Dock (Right / Full Mobile) */}
+      <div className="fc-bottom-hud">
+        <div className="fc-bottom-left-hud">
+          <button
+            type="button"
+            className={`fc-neu-btn fc-chat-fab ${showChat ? 'is-active' : ''}`}
+            onClick={() => setShowChat((v) => !v)}
+            title="Table Chat"
+          >
+            <ChatIcon size={17} />
+            {chatMessages.length > 0 && !showChat && <span className="fc-chat-dot" />}
+          </button>
+
+          {me && (
+            <div className="fc-my-chips-pill">
+              <PokerChipIcon size={18} variant="blue" />
+              <span className="fc-my-chips-val">${me.chips.toLocaleString()}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Player Action Dock (Only rendered when it's our turn) */}
+        {isMyTurn && me && (
+          <ActionDock
+            currentBet={highestBet}
+            myBet={me.bet}
+            myChips={me.chips}
+            bigBlind={tableState.bigBlind}
+            pot={tableState.pot}
+            onAction={handlePlayerAction}
+          />
+        )}
+      </div>
+
       {/* Floating Chat Drawer */}
       {showChat && (
-        <aside className="chat-drawer">
+        <aside className="chat-drawer fc-chat-drawer">
           <div className="chat-header">
             <h4>Table Chat</h4>
             <button
@@ -351,18 +461,6 @@ export const PokerTable: React.FC<PokerTableProps> = ({
             <button type="submit">Send</button>
           </form>
         </aside>
-      )}
-
-      {/* Player Action Dock (Only rendered if player is seated and it's their turn) */}
-      {isMyTurn && me && (
-        <ActionDock
-          currentBet={highestBet}
-          myBet={me.bet}
-          myChips={me.chips}
-          bigBlind={tableState.bigBlind}
-          pot={tableState.pot}
-          onAction={handlePlayerAction}
-        />
       )}
     </div>
   );

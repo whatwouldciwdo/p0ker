@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card as CardType } from '@p0ker/shared';
+import { SuitVectorIcon } from '../icons/CasinoIcons';
 
 interface CardProps {
   card?: CardType | null;
@@ -13,19 +14,6 @@ interface CardProps {
   fanAngle?: number;
   highlight?: boolean;
 }
-
-const SUIT_SYMBOLS: Record<string, string> = {
-  hearts: '♥',
-  diamonds: '♦',
-  clubs: '♣',
-  spades: '♠',
-};
-
-const ROYAL_EMBLEMS: Record<string, string> = {
-  K: '♔',
-  Q: '♕',
-  J: '♘',
-};
 
 export const Card: React.FC<CardProps> = ({
   card,
@@ -47,6 +35,8 @@ export const Card: React.FC<CardProps> = ({
       ? 'card-medium'
       : '';
 
+  const suitIconSize = resolvedSize === 'mini' ? 12 : resolvedSize === 'medium' ? 16 : 20;
+
   const style = {
     '--deal-delay': `${dealDelay}ms`,
     '--deal-x': `${dealFromX}px`,
@@ -57,14 +47,14 @@ export const Card: React.FC<CardProps> = ({
   if (hidden || !card) {
     return (
       <div
-        className={`poker-card-scene ${sizeClass} ${highlight ? 'card-highlight' : ''}`}
+        className={`poker-card-scene fc-card-scene ${sizeClass} ${highlight ? 'card-highlight' : ''}`}
         style={style}
       >
         <div className="poker-card-inner is-dealt-back">
-          <div className="poker-card card-back">
-            <div className="card-back-frame">
-              <div className="card-back-pattern" />
-              <div className="card-back-medallion">♠</div>
+          <div className="poker-card card-back fc-card-back">
+            <div className="card-back-frame fc-back-frame">
+              <div className="card-back-pattern fc-back-pattern" />
+              <div className="card-back-medallion fc-back-medallion">♠</div>
             </div>
           </div>
         </div>
@@ -72,55 +62,32 @@ export const Card: React.FC<CardProps> = ({
     );
   }
 
-  const isRed = card.suit === 'hearts' || card.suit === 'diamonds';
-  const symbol = SUIT_SYMBOLS[card.suit] || card.suit;
-  const isAce = card.rank === 'A';
-  const royalEmblem = ROYAL_EMBLEMS[card.rank];
+  const suitClass = `fc-suit-${card.suit}`;
 
   return (
     <div
-      className={`poker-card-scene ${sizeClass} ${highlight ? 'card-highlight' : ''}`}
+      className={`poker-card-scene fc-card-scene ${sizeClass} ${highlight ? 'card-highlight' : ''}`}
       style={style}
     >
       <div className={`poker-card-inner ${flipReveal ? 'is-flip-reveal' : 'is-dealt-face'}`}>
         {/* Back face shown briefly during 3D flip */}
-        <div className="poker-card card-back card-flip-back">
-          <div className="card-back-frame">
-            <div className="card-back-pattern" />
-            <div className="card-back-medallion">♠</div>
+        <div className="poker-card card-back fc-card-back card-flip-back">
+          <div className="card-back-frame fc-back-frame">
+            <div className="card-back-pattern fc-back-pattern" />
+            <div className="card-back-medallion fc-back-medallion">♠</div>
           </div>
         </div>
 
-        {/* Front face */}
-        <div
-          className={`poker-card card-face card-flip-front ${
-            isRed ? 'card-red' : 'card-black'
-          } ${isAce ? 'card-ace' : ''} ${royalEmblem ? 'card-royal' : ''}`}
-        >
+        {/* FigCraft Glassmorphic 4-Color Neon Card Face */}
+        <div className={`poker-card card-face fc-card-face card-flip-front ${suitClass}`}>
           <div className="card-gloss" />
-          <div className="card-inner-rim" />
-
-          <div className="card-corner top-left">
-            <span className="card-rank">{card.rank}</span>
-            <span className="card-suit">{symbol}</span>
+          <div className="fc-card-top-suit">
+            <SuitVectorIcon suit={card.suit} size={suitIconSize} />
           </div>
-
-          <div className="card-center">
-            {royalEmblem ? (
-              <div className="royal-center-group">
-                <span className="royal-crown">{royalEmblem}</span>
-                <span className="royal-suit-sub">{symbol}</span>
-              </div>
-            ) : (
-              <span className={`center-symbol ${isAce ? 'ace-symbol' : ''}`}>
-                {symbol}
-              </span>
-            )}
-          </div>
-
-          <div className="card-corner bottom-right">
-            <span className="card-rank">{card.rank}</span>
-            <span className="card-suit">{symbol}</span>
+          <div className="fc-card-rank-wrap">
+            <span className={`fc-card-rank ${card.rank === '10' ? 'is-ten' : ''}`}>
+              {card.rank}
+            </span>
           </div>
         </div>
       </div>
